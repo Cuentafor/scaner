@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#16324f">
+<title>Escáner</title>
+<style>
+:root{--bar:56px;--pri:#1f6feb;--pri2:#16324f;--bg:#f4f6f9;--card:#fff;--txt:#1b2430;--mut:#6b7684;--line:#dde3ea;--ok:#1a7f37;--warn:#b35900}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0;background:var(--bg);color:var(--txt);font:16px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-tap-highlight-color:transparent}
+.bar{position:sticky;top:0;z-index:20;height:calc(var(--bar) + env(safe-area-inset-top));padding:env(safe-area-inset-top) 10px 0;display:flex;align-items:center;gap:8px;background:var(--pri2);color:#fff}
+.bar h1{flex:1;font-size:18px;margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.chip{font-size:12px;padding:3px 9px;border-radius:99px;background:rgba(255,255,255,.15);white-space:nowrap}
+.chip.ok{background:rgba(46,160,67,.35)}.chip.err{background:rgba(255,140,0,.35)}
+button{font:inherit;cursor:pointer}
+.icon{background:none;border:0;color:inherit;font-size:26px;width:40px;height:40px;line-height:1;border-radius:10px}
+.btn{border:1px solid var(--line);background:var(--card);color:var(--txt);padding:12px 14px;border-radius:12px;font-weight:600;min-height:46px}
+.btn:active{transform:scale(.98)}
+.btn:disabled{opacity:.45}
+.btn.primary{background:var(--pri);border-color:var(--pri);color:#fff}
+.btn.small{padding:8px 12px;min-height:38px;font-size:14px}
+.btn.ghost{background:transparent}
+.btn.big{width:100%;font-size:19px;padding:18px;border-radius:16px}
+main{max-width:900px;margin:0 auto}
+section{padding:14px 14px calc(90px + env(safe-area-inset-bottom))}
+h2{font-size:15px;color:var(--mut);margin:22px 2px 10px;text-transform:uppercase;letter-spacing:.04em}
+.empty,.muted{color:var(--mut)}
+.empty{text-align:center;padding:30px 10px}
+.item{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:8px;margin-bottom:8px}
+.item img{width:56px;height:72px;object-fit:cover;border-radius:6px;background:#e9edf2;flex:none}
+.item .meta{flex:1;min-width:0}
+.item .meta b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.item .meta small{color:var(--mut)}
+.item .icon{color:#b42318;font-size:20px}
+.name{width:100%;font:inherit;font-weight:600;font-size:17px;padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--card);margin-bottom:12px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(145px,1fr));gap:10px}
+.page{position:relative;background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.page img{display:block;width:100%;aspect-ratio:3/4;object-fit:contain;background:#e9edf2}
+.pnum{position:absolute;top:6px;left:6px;background:rgba(0,0,0,.65);color:#fff;font-size:13px;font-weight:700;border-radius:99px;min-width:24px;height:24px;display:grid;place-items:center;padding:0 6px}
+.badge{font-size:11px;font-weight:700;padding:2px 7px;border-radius:99px;background:#dbeafe;color:#1e40af;margin-left:6px}
+.badge.image{background:#fde7d3;color:var(--warn)}
+.page .badge{position:absolute;top:7px;right:6px;margin:0}
+.pbtns{display:flex;border-top:1px solid var(--line)}
+.pbtns button{flex:1;border:0;background:none;padding:9px 0;font-size:17px}
+.pbtns button:disabled{opacity:.25}
+.pbtns button+button{border-left:1px solid var(--line)}
+.actions{position:fixed;left:0;right:0;bottom:0;z-index:15;display:flex;gap:8px;padding:10px 12px calc(10px + env(safe-area-inset-bottom));background:rgba(244,246,249,.96);border-top:1px solid var(--line);justify-content:center}
+.actions .btn{flex:1;max-width:220px;padding:12px 4px;font-size:14px;white-space:nowrap}
+/* Recorte */
+#vCrop{position:fixed;top:calc(var(--bar) + env(safe-area-inset-top));left:0;right:0;bottom:0;padding:0;display:flex;flex-direction:column;background:#0e1116;z-index:10}
+#stage{flex:1;position:relative;min-height:0}
+#cropCv{position:absolute;inset:0;touch-action:none}
+#loupe{position:absolute;top:10px;width:120px;height:120px;border-radius:50%;border:3px solid #fff;box-shadow:0 4px 14px rgba(0,0,0,.5);pointer-events:none}
+.tools{padding:10px 10px calc(10px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:8px;background:#161b22}
+.row{display:flex;gap:8px}
+.row>.btn{flex:1}
+.row.wrap{flex-wrap:wrap;align-items:center}
+.tools .btn{background:#222a35;border-color:#333d4a;color:#e6edf3}
+.tools .btn.primary{background:var(--pri);border-color:var(--pri);color:#fff}
+.seg{display:flex;background:#222a35;border-radius:12px;padding:3px;gap:3px}
+.seg button{flex:1;border:0;background:none;color:#aab4c0;padding:9px 4px;border-radius:9px;font-size:14px;font-weight:600}
+.seg button.on{background:#e6edf3;color:#0e1116}
+/* Texto */
+select{font:inherit;padding:8px;border-radius:10px;border:1px solid var(--line);background:var(--card)}
+label{display:flex;align-items:center;gap:8px;flex:1;font-weight:600}
+.tp{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px;margin-top:12px}
+.th{margin-bottom:6px;display:flex;align-items:center}
+.tp textarea{width:100%;min-height:180px;font:15px/1.45 ui-monospace,Menlo,Consolas,monospace;border:1px solid var(--line);border-radius:8px;padding:8px;resize:vertical;margin-bottom:6px}
+.tp p{margin:4px 0 8px}
+/* Overlays */
+#busy{position:fixed;inset:0;z-index:50;background:rgba(10,14,20,.6);display:grid;place-items:center}
+#busy .box{background:#fff;border-radius:16px;padding:22px;width:min(320px,86vw);text-align:center}
+.spin{width:36px;height:36px;margin:0 auto 10px;border:4px solid #dbe3ec;border-top-color:var(--pri);border-radius:50%;animation:sp 1s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+.prog{height:6px;background:#e5eaf0;border-radius:9px;overflow:hidden;margin-top:10px}
+.prog i{display:block;height:100%;width:0;background:var(--pri);transition:width .2s}
+#toast{position:fixed;left:50%;bottom:calc(90px + env(safe-area-inset-bottom));transform:translateX(-50%);background:#1b2430;color:#fff;padding:10px 16px;border-radius:12px;font-size:14px;z-index:60;max-width:90vw;opacity:0;pointer-events:none;transition:opacity .25s}
+#toast.show{opacity:1}
+</style>
+</head>
+<body>
+<header class="bar">
+  <button id="back" class="icon" hidden aria-label="Volver">‹</button>
+  <h1 id="title">Escáner</h1>
+  <span id="cvChip" class="chip" title="Detector automático de bordes">Bordes: cargando…</span>
+</header>
+
+<main>
+  <!-- INICIO -->
+  <section id="vHome">
+    <button id="btnNew" class="btn primary big">📷 Nuevo escaneo</button>
+    <h2>Escaneos guardados</h2>
+    <div id="docList"></div>
+  </section>
+
+  <!-- DOCUMENTO -->
+  <section id="vDoc" hidden>
+    <input id="docName" class="name" aria-label="Nombre del escaneo" maxlength="80">
+    <div id="pages" class="grid"></div>
+    <div class="actions">
+      <button id="btnCam" class="btn primary">📷 Cámara</button>
+      <button id="btnGal" class="btn">🖼 Galería</button>
+      <button id="btnPdf" class="btn">📄 PDF</button>
+      <button id="btnText" class="btn">🔤 Texto</button>
+    </div>
+  </section>
+
+  <!-- RECORTE -->
+  <section id="vCrop" hidden>
+    <div id="stage"><canvas id="cropCv"></canvas><canvas id="loupe" hidden></canvas></div>
+    <div class="tools">
+      <div class="row">
+        <button id="edAuto" class="btn small">✨ Auto</button>
+        <button id="edAll" class="btn small">⬚ Toda</button>
+        <button id="edRot" class="btn small">⟳ Girar</button>
+      </div>
+      <div class="seg" id="segFilter">
+        <button data-v="original">Original</button><button data-v="mejorado">Mejorado</button><button data-v="gris">Gris</button><button data-v="bn">B/N</button>
+      </div>
+      <div class="seg" id="segMode">
+        <button data-v="text">Texto impreso (OCR)</button><button data-v="image">A mano / imagen</button>
+      </div>
+      <div class="row">
+        <button id="edCancel" class="btn">Cancelar</button>
+        <button id="edOk" class="btn primary">Aplicar ✓</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- TEXTO -->
+  <section id="vText" hidden>
+    <div class="row wrap">
+      <label>Idioma
+        <select id="langSel">
+          <option value="spa">Castellano</option>
+          <option value="eus">Euskera</option>
+          <option value="spa+eus">Castellano + euskera</option>
+        </select>
+      </label>
+      <button id="btnRun" class="btn small primary">Extraer texto</button>
+    </div>
+    <div id="txtPages"></div>
+    <div class="actions">
+      <button id="btnCopy" class="btn">📋 Copiar todo</button>
+      <button id="btnTxt" class="btn">⬇ Descargar .txt</button>
+    </div>
+  </section>
+</main>
+
+<input type="file" id="inCam" accept="image/*" capture="environment" hidden>
+<input type="file" id="inGal" accept="image/*" multiple hidden>
+
+<div id="busy" hidden><div class="box"><div class="spin"></div><div id="busyMsg">Procesando…</div><div class="prog" id="busyProg"><i id="busyBar"></i></div></div></div>
+<div id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js" defer></script>
+<script>
+'use strict';
+/* ================= Utilidades ================= */
+const $ = s => document.querySelector(s);
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const frame = () => new Promise(r => requestAnimationFrame(() => setTimeout(r, 0)));
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const mk = (w, h) => { const c = document.createElement('canvas'); c.width = w; c.height = h; return c; };
+const fmtDate = t => new Date(t).toLocaleString('es-ES', {day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit'});
+const safeName = s => (s || 'escaneo').replace(/[\\/:*?"<>|]+/g, '-').trim() || 'escaneo';
+const store = {
+  get(k, d){ try { const v = localStorage.getItem('esc_' + k); return v == null ? d : JSON.parse(v); } catch(e){ return d; } },
+  set(k, v){ try { localStorage.setItem('esc_' + k, JSON.stringify(v)); } catch(e){} }
+};
+const settings = { mode: store.get('mode', 'text'), filter: store.get('filter', 'mejorado'), lang: store.get('lang', 'spa') };
+
+function loadImg(src){
+  return new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = () => rej(new Error('imagen no válida')); i.src = src; });
+}
+let toastT;
+function toast(msg){ const t = $('#toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('show'), 2800); }
+function busy(msg, pct){
+  $('#busy').hidden = false; if (msg) $('#busyMsg').textContent = msg;
+  $('#busyProg').hidden = pct == null; if (pct != null) $('#busyBar').style.width = Math.round(Math.max(0, Math.min(1, pct)) * 100) + '%';
+}
+function unbusy(){ $('#busy').hidden = true; }
+function download(blob, name){
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name;
+  document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+}
+
+/* ================= Base de datos (IndexedDB) ================= */
+const DB = {
+  db: null,
+  open(){ return new Promise((res, rej) => {
+    const r = indexedDB.open('escaner-db', 1);
+    r.onupgradeneeded = () => r.result.createObjectStore('docs', { keyPath: 'id' });
+    r.onsuccess = () => { this.db = r.result; res(); };
+    r.onerror = () => rej(r.error);
+  }); },
+  req(mode, fn){ return new Promise((res, rej) => {
+    if (!this.db) return res(mode === 'readonly' ? [] : undefined);
+    const r = fn(this.db.transaction('docs', mode).objectStore('docs'));
+    r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error);
+  }); },
+  all(){ return this.req('readonly', s => s.getAll()); },
+  put(d){ return this.req('readwrite', s => s.put(d)); },
+  del(id){ return this.req('readwrite', s => s.delete(id)); }
+};
+
+/* ================= Navegación ================= */
+let view = 'home', doc = null, ed = null;
+function show(v){
+  view = v;
+  document.querySelectorAll('main>section').forEach(s => s.hidden = s.id !== 'v' + v[0].toUpperCase() + v.slice(1));
+  $('#back').hidden = v === 'home';
+  $('#title').textContent = { home:'Escáner', doc: doc ? doc.name : 'Escaneo', crop:'Recortar página', text:'Texto' }[v];
+  window.scrollTo(0, 0);
+  if (v === 'crop') requestAnimationFrame(sizeCrop);
+}
+$('#back').onclick = () => {
+  if (view === 'doc'){ doc = null; renderHome(); show('home'); }
+  else if (view === 'crop'){ ed = null; show('doc'); }
+  else if (view === 'text'){ renderDoc(); show('doc'); }
+};
+
+/* ================= Inicio ================= */
+async function renderHome(){
+  let docs = [];
+  try { docs = (await DB.all()).sort((a, b) => b.updated - a.updated); } catch(e){}
+  const list = $('#docList');
+  if (!docs.length){ list.innerHTML = '<p class="empty">Aún no hay escaneos guardados.</p>'; return; }
+  list.innerHTML = docs.map(d => `
+    <div class="item" data-id="${d.id}">
+      <img src="${d.pages[0] ? d.pages[0].thumb : ''}" alt="">
+      <div class="meta"><b>${esc(d.name)}</b><small>${d.pages.length} pág. · ${fmtDate(d.updated)}</small></div>
+      <button class="icon" data-del="${d.id}" aria-label="Borrar">🗑</button>
+    </div>`).join('');
+  list._docs = docs;
+}
+$('#docList').onclick = async e => {
+  const del = e.target.closest('[data-del]');
+  if (del){
+    if (!confirm('¿Borrar este escaneo? No se puede deshacer.')) return;
+    await DB.del(del.dataset.del); renderHome(); return;
+  }
+  const it = e.target.closest('.item'); if (!it) return;
+  doc = $('#docList')._docs.find(d => d.id === it.dataset.id);
+  if (doc){ renderDoc(); show('doc'); }
+};
+$('#btnNew').onclick = () => {
+  doc = { id: uid(), name: 'Escaneo ' + fmtDate(Date.now()), created: Date.now(), updated: Date.now(), pages: [] };
+  renderDoc(); show('doc');
+  $('#inCam').click();
+};
+
+/* ================= Documento ================= */
+let saveT;
+async function saveDoc(){
+  if (!doc || !doc.pages.length) return;
+  doc.updated = Date.now();
+  try { await DB.put(doc); } catch(e){ toast('No se pudo guardar (¿memoria llena?)'); }
+}
+function saveSoon(){ clearTimeout(saveT); saveT = setTimeout(saveDoc, 600); }
+
+function renderDoc(){
+  $('#docName').value = doc.name;
+  const g = $('#pages'), n = doc.pages.length;
+  g.innerHTML = n ? doc.pages.map((p, i) => `
+    <div class="page" data-i="${i}">
+      <img src="${p.thumb}" data-act="edit" alt="Página ${i + 1}">
+      <div class="pnum">${i + 1}</div>
+      <span class="badge ${p.mode}">${p.mode === 'text' ? 'Texto' : 'Imagen'}</span>
+      <div class="pbtns">
+        <button data-act="up" ${i === 0 ? 'disabled' : ''} aria-label="Subir">↑</button>
+        <button data-act="down" ${i === n - 1 ? 'disabled' : ''} aria-label="Bajar">↓</button>
+        <button data-act="edit" aria-label="Editar">✎</button>
+        <button data-act="del" aria-label="Borrar">🗑</button>
+      </div>
+    </div>`).join('')
+    : '<p class="empty">Añade la primera página con la cámara o desde la galería.</p>';
+  $('#btnPdf').disabled = $('#btnText').disabled = !n;
+  if (view === 'doc') $('#title').textContent = doc.name;
+}
+$('#docName').oninput = e => { doc.name = e.target.value.trim() || 'Escaneo'; $('#title').textContent = doc.name; saveSoon(); };
+$('#pages').onclick = async e => {
+  const b = e.target.closest('[data-act]'); if (!b) return;
+  const i = +b.closest('.page').dataset.i, P = doc.pages;
+  switch (b.dataset.act){
+    case 'up': [P[i - 1], P[i]] = [P[i], P[i - 1]]; break;
+    case 'down': [P[i + 1], P[i]] = [P[i], P[i + 1]]; break;
+    case 'del':
+      if (!confirm(`¿Borrar la página ${i + 1}?`)) return;
+      P.splice(i, 1);
+      if (!P.length){ await DB.del(doc.id); renderDoc(); return; }
+      break;
+    case 'edit': return openEditor(P[i], i);
+  }
+  renderDoc(); saveDoc();
+};
+$('#btnCam').onclick = () => $('#inCam').click();
+$('#btnGal').onclick = () => $('#inGal').click();
+['#inCam', '#inGal'].forEach(id => $(id).onchange = e => { const f = [...e.target.files]; e.target.value = ''; handleFiles(f); });
+
+async function newPageFromFile(file){
+  const url = URL.createObjectURL(file);
+  try {
+    const img = await loadImg(url);
+    const w = img.naturalWidth, h = img.naturalHeight, k = Math.min(1, 2400 / Math.max(w, h));
+    const c = mk(Math.round(w * k), Math.round(h * k));
+    c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+    return { id: uid(), original: c.toDataURL('image/jpeg', 0.9), corners: detectCorners(c),
+             filter: settings.filter, mode: settings.mode, text: '', processed: '', thumb: '' };
+  } finally { URL.revokeObjectURL(url); }
+}
+async function handleFiles(files){
+  if (!files.length) return;
+  try {
+    if (files.length === 1){
+      busy('Cargando foto…'); await frame();
+      const p = await newPageFromFile(files[0]);
+      unbusy(); openEditor(p, -1); return;
+    }
+    for (let i = 0; i < files.length; i++){
+      busy(`Procesando ${i + 1} de ${files.length}…`, i / files.length); await frame();
+      const p = await newPageFromFile(files[i]);
+      await processPage(p); doc.pages.push(p);
+    }
+    await saveDoc(); renderDoc();
+    toast('Páginas añadidas. Toca una para ajustar el recorte.');
+  } catch(err){ console.error(err); toast('No se pudo abrir la imagen'); }
+  finally { unbusy(); }
+}
+
+/* ================= Detección de bordes (OpenCV) ================= */
+let cvReady = false;
+function setChip(state){
+  const c = $('#cvChip');
+  c.className = 'chip' + (state === 'ok' ? ' ok' : state === 'err' ? ' err' : '');
+  c.textContent = { load:'Bordes: cargando…', ok:'Bordes: auto', err:'Bordes: manual' }[state];
+}
+function loadCV(){
+  setChip('load');
+  const s = document.createElement('script');
+  s.src = 'https://docs.opencv.org/4.10.0/opencv.js'; s.async = true;
+  s.onload = async () => {
+    try {
+      const t0 = Date.now();
+      if (window.cv && typeof window.cv.then === 'function' && !window.cv.Mat) window.cv = await window.cv;
+      while (!(window.cv && window.cv.Mat && window.cv.imread)){
+        if (Date.now() - t0 > 60000) throw new Error('timeout');
+        await sleep(200);
+      }
+      cvReady = true; setChip('ok');
+    } catch(e){ setChip('err'); }
+  };
+  s.onerror = () => setChip('err');
+  document.head.appendChild(s);
+}
+function orderCorners(pts){
+  const by = f => pts.reduce((a, b) => f(b) < f(a) ? b : a);
+  const byMax = f => pts.reduce((a, b) => f(b) > f(a) ? b : a);
+  return [ by(p => p.x + p.y), by(p => p.y - p.x), byMax(p => p.x + p.y), byMax(p => p.y - p.x) ]
+    .map(p => ({ x: p.x, y: p.y })); // tl, tr, br, bl
+}
+function defaultCorners(w, h, m = 0.04){
+  return [{x:w*m, y:h*m}, {x:w*(1-m), y:h*m}, {x:w*(1-m), y:h*(1-m)}, {x:w*m, y:h*(1-m)}];
+}
+function detectCorners(src){
+  const iw = src.naturalWidth || src.width, ih = src.naturalHeight || src.height;
+  if (!cvReady) return defaultCorners(iw, ih);
+  const s = Math.min(1, 640 / Math.max(iw, ih));
+  const c = mk(Math.round(iw * s), Math.round(ih * s));
+  c.getContext('2d').drawImage(src, 0, 0, c.width, c.height);
+  const trash = [];
+  const keep = m => (trash.push(m), m);
+  let found = null;
+  try {
+    const mat = keep(cv.imread(c)), gray = keep(new cv.Mat()), blur = keep(new cv.Mat()), edges = keep(new cv.Mat());
+    cv.cvtColor(mat, gray, cv.COLOR_RGBA2GRAY);
+    cv.GaussianBlur(gray, blur, new cv.Size(5, 5), 0);
+    cv.Canny(blur, edges, 40, 140);
+    const k = keep(cv.getStructuringElement(cv.MORPH_RECT, new cv.Size(5, 5)));
+    cv.dilate(edges, edges, k);
+    const contours = keep(new cv.MatVector()), hier = keep(new cv.Mat());
+    cv.findContours(edges, contours, hier, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE);
+    const minArea = 0.15 * c.width * c.height;
+    let bestArea = 0, bestIdx = -1;
+    for (let i = 0; i < contours.size(); i++){
+      const cnt = contours.get(i); const area = cv.contourArea(cnt);
+      if (area > bestArea){ bestArea = area; bestIdx = i; }
+      if (area >= minArea){
+        const approx = new cv.Mat();
+        cv.approxPolyDP(cnt, approx, 0.02 * cv.arcLength(cnt, true), true);
+        if (approx.rows === 4 && cv.isContourConvex(approx) && (!found || area > found.area)){
+          const d = approx.data32S; found = { area, pts: [0, 1, 2, 3].map(j => ({ x: d[j*2], y: d[j*2+1] })) };
+        }
+        approx.delete();
+      }
+      cnt.delete();
+    }
+    if (!found && bestIdx >= 0 && bestArea >= minArea){
+      const cnt = keep(contours.get(bestIdx)), hull = keep(new cv.Mat());
+      cv.convexHull(cnt, hull, false, true);
+      const peri = cv.arcLength(hull, true);
+      for (let eps = 0.02; eps <= 0.12 && !found; eps += 0.01){
+        const approx = new cv.Mat();
+        cv.approxPolyDP(hull, approx, eps * peri, true);
+        if (approx.rows === 4){ const d = approx.data32S; found = { pts: [0, 1, 2, 3].map(j => ({ x: d[j*2], y: d[j*2+1] })) }; }
+        approx.delete();
+      }
+    }
+  } catch(e){ console.warn('detección', e); }
+  finally { trash.forEach(m => { try { m.delete(); } catch(e){} }); }
+  if (!found) return defaultCorners(iw, ih);
+  return orderCorners(found.pts.map(p => ({ x: Math.min(iw, Math.max(0, p.x / s)), y: Math.min(ih, Math.max(0, p.y / s)) })));
+}
+
+/* ================= Enderezado (perspectiva) y filtros ================= */
+function solveH(src, dst){ // homografía que lleva src -> dst
+  const A = [], b = [];
+  for (let i = 0; i < 4; i++){
+    const { x, y } = src[i], u = dst[i].x, v = dst[i].y;
+    A.push([x, y, 1, 0, 0, 0, -u * x, -u * y]); b.push(u);
+    A.push([0, 0, 0, x, y, 1, -v * x, -v * y]); b.push(v);
+  }
+  for (let c = 0; c < 8; c++){
+    let p = c;
+    for (let r = c + 1; r < 8; r++) if (Math.abs(A[r][c]) > Math.abs(A[p][c])) p = r;
+    [A[c], A[p]] = [A[p], A[c]]; [b[c], b[p]] = [b[p], b[c]];
+    const d = A[c][c]; if (Math.abs(d) < 1e-12) throw new Error('Esquinas no válidas');
+    for (let r = 0; r < 8; r++){
+      if (r === c) continue; const f = A[r][c] / d; if (!f) continue;
+      for (let k = c; k < 8; k++) A[r][k] -= f * A[c][k];
+      b[r] -= f * b[c];
+    }
+  }
+  return b.map((v, i) => v / A[i][i]);
+}
+function warp(img, corners){
+  const [tl, tr, br, bl] = corners, d = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
+  let W = Math.max(d(tl, tr), d(bl, br)), H = Math.max(d(tl, bl), d(tr, br));
+  const k = Math.min(1, 2200 / Math.max(W, H));
+  W = Math.max(8, Math.round(W * k)); H = Math.max(8, Math.round(H * k));
+  const sw = img.naturalWidth, sh = img.naturalHeight;
+  const sc = mk(sw, sh), sx = sc.getContext('2d'); sx.drawImage(img, 0, 0);
+  const S = sx.getImageData(0, 0, sw, sh).data;
+  const h = solveH([{x:0,y:0}, {x:W,y:0}, {x:W,y:H}, {x:0,y:H}], [tl, tr, br, bl]);
+  const oc = mk(W, H), octx = oc.getContext('2d'), od = octx.createImageData(W, H), O = od.data;
+  const mx = sw - 1.001, my = sh - 1.001, row = sw * 4;
+  let o = 0;
+  for (let y = 0; y < H; y++){
+    const yy = y + 0.5;
+    for (let x = 0; x < W; x++){
+      const xx = x + 0.5, den = h[6] * xx + h[7] * yy + 1;
+      let X = (h[0] * xx + h[1] * yy + h[2]) / den - 0.5, Y = (h[3] * xx + h[4] * yy + h[5]) / den - 0.5;
+      X = X < 0 ? 0 : X > mx ? mx : X; Y = Y < 0 ? 0 : Y > my ? my : Y;
+      const x0 = X | 0, y0 = Y | 0, fx = X - x0, fy = Y - y0, i = (y0 * sw + x0) * 4, j = i + row;
+      for (let ch = 0; ch < 3; ch++){
+        const a = S[i + ch] + (S[i + 4 + ch] - S[i + ch]) * fx;
+        const c = S[j + ch] + (S[j + 4 + ch] - S[j + ch]) * fx;
+        O[o + ch] = a + (c - a) * fy;
+      }
+      O[o + 3] = 255; o += 4;
+    }
+  }
+  octx.putImageData(od, 0, 0);
+  return oc;
+}
+function percentiles(hist, n, lo, hi){
+  let acc = 0, a = 0, b = 255;
+  for (let v = 0; v < 256; v++){ acc += hist[v]; if (acc >= n * lo){ a = v; break; } }
+  acc = 0;
+  for (let v = 255; v >= 0; v--){ acc += hist[v]; if (acc >= n * (1 - hi)){ b = v; break; } }
+  if (b - a < 30){ a = Math.max(0, a - 15); b = Math.min(255, b + 15); }
+  return [a, b];
+}
+function stretchLUT(a, b){ const L = new Uint8ClampedArray(256); for (let v = 0; v < 256; v++) L[v] = (v - a) * 255 / (b - a); return L; }
+function applyFilter(c, f){
+  if (f === 'original') return;
+  const W = c.width, H = c.height, ctx = c.getContext('2d'), id = ctx.getImageData(0, 0, W, H), D = id.data, n = W * H;
+  if (f === 'mejorado'){
+    for (let ch = 0; ch < 3; ch++){
+      const hist = new Uint32Array(256);
+      for (let i = ch; i < D.length; i += 4) hist[D[i]]++;
+      const [a, b] = percentiles(hist, n, 0.005, 0.97), L = stretchLUT(a, b);
+      for (let i = ch; i < D.length; i += 4) D[i] = L[D[i]];
+    }
+  } else {
+    const G = new Uint8ClampedArray(n);
+    for (let i = 0, p = 0; p < n; i += 4, p++) G[p] = 0.299 * D[i] + 0.587 * D[i + 1] + 0.114 * D[i + 2];
+    if (f === 'gris'){
+      const hist = new Uint32Array(256); for (let p = 0; p < n; p++) hist[G[p]]++;
+      const [a, b] = percentiles(hist, n, 0.01, 0.97), L = stretchLUT(a, b);
+      for (let p = 0; p < n; p++) G[p] = L[G[p]];
+    } else { // bn: umbral adaptativo (Bradley)
+      const I = new Uint32Array((W + 1) * (H + 1));
+      for (let y = 0; y < H; y++){
+        let s = 0;
+        for (let x = 0; x < W; x++){ s += G[y * W + x]; I[(y + 1) * (W + 1) + x + 1] = I[y * (W + 1) + x + 1] + s; }
+      }
+      const r = Math.max(8, Math.round(Math.min(W, H) / 30)), T = 0.13, out = new Uint8ClampedArray(n);
+      for (let y = 0; y < H; y++){
+        const y1 = Math.max(0, y - r), y2 = Math.min(H, y + r + 1);
+        for (let x = 0; x < W; x++){
+          const x1 = Math.max(0, x - r), x2 = Math.min(W, x + r + 1);
+          const cnt = (x2 - x1) * (y2 - y1);
+          const sum = I[y2 * (W + 1) + x2] - I[y1 * (W + 1) + x2] - I[y2 * (W + 1) + x1] + I[y1 * (W + 1) + x1];
+          out[y * W + x] = G[y * W + x] * cnt < sum * (1 - T) ? 0 : 255;
+        }
+      }
+      G.set(out);
+    }
+    for (let i = 0, p = 0; p < n; i += 4, p++) D[i] = D[i + 1] = D[i + 2] = G[p];
+  }
+  ctx.putImageData(id, 0, 0);
+}
+async function processPage(p){
+  const img = await loadImg(p.original);
+  const out = warp(img, p.corners);
+  applyFilter(out, p.filter);
+  p.processed = out.toDataURL('image/jpeg', 0.88);
+  p.w = out.width; p.h = out.height;
+  const k = Math.min(1, 320 / Math.max(out.width, out.height)), t = mk(Math.round(out.width * k), Math.round(out.height * k));
+  const tc = t.getContext('2d'); tc.imageSmoothingQuality = 'high'; tc.drawImage(out, 0, 0, t.width, t.height);
+  p.thumb = t.toDataURL('image/jpeg', 0.75);
+}
+
+/* ================= Editor de recorte ================= */
+function setSeg(id, v){ document.querySelectorAll(id + ' button').forEach(b => b.classList.toggle('on', b.dataset.v === v)); }
+$('#segFilter').onclick = e => { const b = e.target.closest('button'); if (!b || !ed) return; ed.p.filter = b.dataset.v; setSeg('#segFilter', ed.p.filter); };
+$('#segMode').onclick = e => { const b = e.target.closest('button'); if (!b || !ed) return; ed.p.mode = b.dataset.v; setSeg('#segMode', ed.p.mode); };
+
+async function openEditor(page, idx){
+  try {
+    const p = JSON.parse(JSON.stringify(page));
+    ed = { p, idx, img: await loadImg(p.original), drag: -1,
+           before: JSON.stringify([page.original.length, page.corners, page.filter]) };
+    setSeg('#segFilter', p.filter); setSeg('#segMode', p.mode);
+    show('crop');
+  } catch(e){ toast('No se pudo abrir la página'); }
+}
+function sizeCrop(){
+  const st = $('#stage'), c = $('#cropCv'), dpr = window.devicePixelRatio || 1;
+  c.width = st.clientWidth * dpr; c.height = st.clientHeight * dpr;
+  c.style.width = st.clientWidth + 'px'; c.style.height = st.clientHeight + 'px';
+  drawCrop();
+}
+window.addEventListener('resize', () => { if (view === 'crop') sizeCrop(); });
+function drawCrop(){
+  if (!ed) return;
+  const c = $('#cropCv'), x = c.getContext('2d'), dpr = window.devicePixelRatio || 1;
+  const W = c.width / dpr, H = c.height / dpr, iw = ed.img.naturalWidth, ih = ed.img.naturalHeight, pad = 22;
+  const s = Math.min((W - 2 * pad) / iw, (H - 2 * pad) / ih), ox = (W - iw * s) / 2, oy = (H - ih * s) / 2;
+  Object.assign(ed, { s, ox, oy });
+  x.setTransform(dpr, 0, 0, dpr, 0, 0); x.clearRect(0, 0, W, H);
+  x.drawImage(ed.img, ox, oy, iw * s, ih * s);
+  const P = ed.p.corners.map(q => ({ x: ox + q.x * s, y: oy + q.y * s }));
+  const quad = () => { x.beginPath(); x.moveTo(P[0].x, P[0].y); for (let i = 1; i < 4; i++) x.lineTo(P[i].x, P[i].y); x.closePath(); };
+  x.save(); x.beginPath(); x.rect(ox, oy, iw * s, ih * s);
+  x.moveTo(P[0].x, P[0].y); for (let i = 1; i < 4; i++) x.lineTo(P[i].x, P[i].y); x.closePath();
+  x.fillStyle = 'rgba(0,0,0,.5)'; x.fill('evenodd'); x.restore();
+  quad(); x.lineWidth = 2.5; x.strokeStyle = '#3fa9ff'; x.stroke();
+  P.forEach((q, i) => {
+    x.beginPath(); x.arc(q.x, q.y, ed.drag === i ? 15 : 12, 0, Math.PI * 2);
+    x.fillStyle = 'rgba(63,169,255,.35)'; x.fill(); x.lineWidth = 3; x.strokeStyle = '#fff'; x.stroke();
+  });
+}
+function drawLoupe(ix, iy, px){
+  const L = $('#loupe'), st = $('#stage'), sz = 120, dpr = window.devicePixelRatio || 1;
+  L.hidden = false; L.width = sz * dpr; L.height = sz * dpr;
+  L.style.left = (px < st.clientWidth / 2 ? st.clientWidth - sz - 12 : 12) + 'px';
+  const x = L.getContext('2d'); x.setTransform(dpr, 0, 0, dpr, 0, 0);
+  const z = ed.s * 3, r = sz / 2 / z;
+  x.fillStyle = '#000'; x.fillRect(0, 0, sz, sz);
+  x.drawImage(ed.img, ix - r, iy - r, 2 * r, 2 * r, 0, 0, sz, sz);
+  const P = ed.p.corners.map(q => ({ x: (q.x - ix) * z + sz / 2, y: (q.y - iy) * z + sz / 2 }));
+  x.beginPath(); x.moveTo(P[0].x, P[0].y); for (let i = 1; i < 4; i++) x.lineTo(P[i].x, P[i].y); x.closePath();
+  x.lineWidth = 2; x.strokeStyle = '#3fa9ff'; x.stroke();
+  x.strokeStyle = '#ff3b30'; x.lineWidth = 1.5; x.beginPath();
+  x.moveTo(sz / 2 - 10, sz / 2); x.lineTo(sz / 2 + 10, sz / 2); x.moveTo(sz / 2, sz / 2 - 10); x.lineTo(sz / 2, sz / 2 + 10); x.stroke();
+}
+(() => {
+  const c = $('#cropCv');
+  const pos = e => { const r = c.getBoundingClientRect(); return { x: e.clientX - r.left, y: e.clientY - r.top }; };
+  c.addEventListener('pointerdown', e => {
+    if (!ed) return;
+    const p = pos(e); let best = -1, bd = 48;
+    ed.p.corners.forEach((q, i) => { const d = Math.hypot(ed.ox + q.x * ed.s - p.x, ed.oy + q.y * ed.s - p.y); if (d < bd){ bd = d; best = i; } });
+    if (best < 0) return;
+    const q = ed.p.corners[best];
+    ed.drag = best; ed.grab = { dx: ed.ox + q.x * ed.s - p.x, dy: ed.oy + q.y * ed.s - p.y };
+    c.setPointerCapture(e.pointerId); e.preventDefault(); move(e);
+  });
+  const move = e => {
+    if (!ed || ed.drag < 0) return;
+    const p = pos(e), iw = ed.img.naturalWidth, ih = ed.img.naturalHeight;
+    const ix = Math.min(iw, Math.max(0, (p.x + ed.grab.dx - ed.ox) / ed.s));
+    const iy = Math.min(ih, Math.max(0, (p.y + ed.grab.dy - ed.oy) / ed.s));
+    ed.p.corners[ed.drag] = { x: ix, y: iy };
+    drawCrop(); drawLoupe(ix, iy, p.x);
+  };
+  const up = () => { if (!ed) return; ed.drag = -1; $('#loupe').hidden = true; drawCrop(); };
+  c.addEventListener('pointermove', move);
+  c.addEventListener('pointerup', up);
+  c.addEventListener('pointercancel', up);
+})();
+$('#edAuto').onclick = () => {
+  if (!ed) return;
+  if (!cvReady){ toast('El detector de bordes aún no está listo. Ajusta las esquinas a mano.'); return; }
+  ed.p.corners = detectCorners(ed.img); drawCrop();
+};
+$('#edAll').onclick = () => { if (!ed) return; ed.p.corners = defaultCorners(ed.img.naturalWidth, ed.img.naturalHeight, 0); drawCrop(); };
+$('#edRot').onclick = async () => {
+  if (!ed) return;
+  const im = ed.img, w = im.naturalWidth, h = im.naturalHeight, c = mk(h, w), x = c.getContext('2d');
+  x.translate(h, 0); x.rotate(Math.PI / 2); x.drawImage(im, 0, 0);
+  ed.p.original = c.toDataURL('image/jpeg', 0.92);
+  ed.p.corners = orderCorners(ed.p.corners.map(q => ({ x: h - q.y, y: q.x })));
+  ed.img = await loadImg(ed.p.original); drawCrop();
+};
+$('#edCancel').onclick = () => { ed = null; show('doc'); };
+$('#edOk').onclick = async () => {
+  if (!ed) return;
+  const { p, idx } = ed;
+  busy('Enderezando y mejorando…'); await frame();
+  try {
+    await processPage(p);
+    if (idx >= 0 && ed.before !== JSON.stringify([p.original.length, p.corners, p.filter])) p.text = '';
+    if (idx < 0) doc.pages.push(p); else doc.pages[idx] = p;
+    settings.mode = p.mode; settings.filter = p.filter; store.set('mode', p.mode); store.set('filter', p.filter);
+    await saveDoc();
+    ed = null; renderDoc(); show('doc');
+  } catch(e){ console.error(e); toast('No se pudo procesar: ' + e.message); }
+  finally { unbusy(); }
+};
+
+/* ================= PDF ================= */
+$('#btnPdf').onclick = async () => {
+  if (!doc.pages.length) return;
+  if (!window.jspdf){ toast('El generador de PDF no se ha cargado. Revisa la conexión.'); return; }
+  busy('Creando PDF…', 0); await frame();
+  try {
+    const { jsPDF } = window.jspdf; let pdf = null;
+    for (let i = 0; i < doc.pages.length; i++){
+      const p = doc.pages[i], orient = p.w > p.h ? 'l' : 'p';
+      if (!pdf) pdf = new jsPDF({ orientation: orient, unit: 'mm', format: 'a4', compress: true });
+      else pdf.addPage('a4', orient);
+      const pw = pdf.internal.pageSize.getWidth(), ph = pdf.internal.pageSize.getHeight(), m = 6;
+      const k = Math.min((pw - 2 * m) / p.w, (ph - 2 * m) / p.h), w = p.w * k, h = p.h * k;
+      pdf.addImage(p.processed, 'JPEG', (pw - w) / 2, (ph - h) / 2, w, h, undefined, 'FAST');
+      busy(null, (i + 1) / doc.pages.length); await frame();
+    }
+    download(pdf.output('blob'), safeName(doc.name) + '.pdf');
+  } catch(e){ console.error(e); toast('Error al crear el PDF'); }
+  finally { unbusy(); }
+};
+
+/* ================= Texto (OCR) ================= */
+let ocrWorker = null, ocrLang = null, ocrBusy = false, ocrProgress = null;
+async function getWorker(lang){
+  if (ocrWorker && ocrLang === lang) return ocrWorker;
+  if (ocrWorker){ try { await ocrWorker.terminate(); } catch(e){} ocrWorker = null; }
+  ocrWorker = await Tesseract.createWorker(lang, 1, { logger: m => ocrProgress && ocrProgress(m) });
+  ocrLang = lang; return ocrWorker;
+}
+const cleanText = t => (t || '')
+  .replace(/([a-záéíóúüñ])-\n([a-záéíóúüñ])/gi, '$1$2')
+  .replace(/[ \t]+\n/g, '\n').replace(/\n{3,}/g, '\n\n').trim();
+
+function renderText(){
+  $('#langSel').value = settings.lang;
+  $('#txtPages').innerHTML = doc.pages.map((p, i) => {
+    const head = `<div class="th"><b>Página ${i + 1}</b>${p.mode === 'image' ? '<span class="badge image">Imagen</span>' : ''}</div>`;
+    if (p.mode === 'image' && !p.text)
+      return `<div class="tp">${head}<p class="muted">Guardada como imagen, sin extraer texto.</p><button class="btn small" data-ocr="${i}">Extraer texto de esta página</button></div>`;
+    return `<div class="tp">${head}<textarea data-i="${i}" placeholder="Sin texto todavía">${esc(p.text || '')}</textarea><button class="btn small ghost" data-ocr="${i}">${p.text ? 'Volver a leer' : 'Leer esta página'}</button></div>`;
+  }).join('');
+}
+$('#txtPages').addEventListener('input', e => { const t = e.target.closest('textarea'); if (!t) return; doc.pages[+t.dataset.i].text = t.value; saveSoon(); });
+$('#txtPages').addEventListener('click', e => { const b = e.target.closest('[data-ocr]'); if (b) runOCR([+b.dataset.ocr]); });
+$('#langSel').onchange = e => { settings.lang = e.target.value; store.set('lang', settings.lang); };
+const pending = () => doc.pages.map((p, i) => i).filter(i => doc.pages[i].mode === 'text' && !doc.pages[i].text);
+$('#btnText').onclick = () => { renderText(); show('text'); if (pending().length) runOCR(pending()); };
+$('#btnRun').onclick = () => {
+  const list = pending();
+  if (list.length) return runOCR(list);
+  const all = doc.pages.map((p, i) => i).filter(i => doc.pages[i].mode === 'text');
+  if (!all.length){ toast('Todas las páginas están en modo imagen. Usa "Extraer texto de esta página".'); return; }
+  if (confirm('Ya hay texto extraído. ¿Volver a leer todas las páginas de texto? Se perderán los cambios hechos a mano.')) runOCR(all);
+};
+async function runOCR(indices){
+  if (ocrBusy || !indices.length) return;
+  if (!window.Tesseract){ toast('El lector de texto no se ha cargado. Revisa la conexión.'); return; }
+  ocrBusy = true;
+  try {
+    const n = indices.length;
+    for (let k = 0; k < n; k++){
+      const i = indices[k], label = `Leyendo página ${i + 1}${n > 1 ? ` (${k + 1} de ${n})` : ''}…`;
+      busy(label, k / n);
+      ocrProgress = m => {
+        if (m.status === 'recognizing text') busy(label, (k + m.progress) / n);
+        else busy('Preparando el lector de texto (la primera vez tarda más)…', null);
+      };
+      const w = await getWorker(settings.lang);
+      busy(label, k / n);
+      const { data } = await w.recognize(doc.pages[i].processed);
+      doc.pages[i].text = cleanText(data.text) || '(no se ha encontrado texto)';
+    }
+    await saveDoc(); renderText(); toast('Texto extraído. Puedes corregirlo aquí mismo.');
+  } catch(e){ console.error(e); toast('Error al leer el texto: ' + (e.message || e)); }
+  finally { ocrBusy = false; ocrProgress = null; unbusy(); }
+}
+function allText(){
+  const withText = doc.pages.map((p, i) => ({ i, t: (p.text || '').trim() })).filter(x => x.t && x.t !== '(no se ha encontrado texto)');
+  if (withText.length <= 1) return withText.length ? withText[0].t : '';
+  return withText.map(x => `— Página ${x.i + 1} —\n${x.t}`).join('\n\n');
+}
+$('#btnCopy').onclick = async () => {
+  const t = allText(); if (!t){ toast('Todavía no hay texto'); return; }
+  try { await navigator.clipboard.writeText(t); }
+  catch(e){ const a = document.createElement('textarea'); a.value = t; document.body.appendChild(a); a.select(); try { document.execCommand('copy'); } catch(_){} a.remove(); }
+  toast('Texto copiado');
+};
+$('#btnTxt').onclick = () => {
+  const t = allText(); if (!t){ toast('Todavía no hay texto'); return; }
+  download(new Blob(['﻿' + t], { type: 'text/plain;charset=utf-8' }), safeName(doc.name) + '.txt');
+};
+
+/* ================= Arranque ================= */
+(async () => {
+  try { await DB.open(); } catch(e){ toast('Este navegador no permite guardar el historial'); }
+  renderHome();
+  loadCV();
+  try { navigator.storage && navigator.storage.persist && navigator.storage.persist(); } catch(e){}
+})();
+</script>
+</body>
+</html>
