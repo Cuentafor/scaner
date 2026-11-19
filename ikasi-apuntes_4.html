@@ -1,0 +1,1852 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ikasi Apuntes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=JetBrains+Mono&display=swap">
+<style>
+/* Layout: cuaderno de cuadrícula. Una columna estrecha de hojas de papel sobre la cuadrícula; tinta azul de bolígrafo para las acciones, fluorescente para lo añadido y rojo de corrector para lo corregido. */
+:root{
+  --paper:#F5F7FB; --grid:rgba(35,72,184,.075); --card:#FFFFFF; --ink:#18202E; --muted:#596379; --line:#D9DFEA;
+  --pen:#2348B8; --on-pen:#FFFFFF; --pen-soft:#E5EBFA; --fluor:#EDF26B; --red:#C42339;
+  --ok:#1B7F52; --warn:#A16400; --okbg:#E2F2E9; --warnbg:#FAEFD6; --badbg:#FAE4E7; --pendbg:#ECEFF5;
+  --f-disp:"Bricolage Grotesque","Segoe UI",system-ui,sans-serif;
+  --f-body:"Atkinson Hyperlegible","Segoe UI",system-ui,sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#10141C; --grid:rgba(142,168,255,.06); --card:#181E29; --ink:#E5E9F1; --muted:#9AA3B6; --line:#2A3242;
+  --pen:#8EA8FF; --on-pen:#0E1420; --pen-soft:#212A42; --fluor:rgba(226,240,80,.30); --red:#FF7D8C;
+  --ok:#5FD09B; --warn:#F0B651; --okbg:#152C22; --warnbg:#30270F; --badbg:#37181F; --pendbg:#1F2533; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#10141C; --grid:rgba(142,168,255,.06); --card:#181E29; --ink:#E5E9F1; --muted:#9AA3B6; --line:#2A3242;
+  --pen:#8EA8FF; --on-pen:#0E1420; --pen-soft:#212A42; --fluor:rgba(226,240,80,.30); --red:#FF7D8C;
+  --ok:#5FD09B; --warn:#F0B651; --okbg:#152C22; --warnbg:#30270F; --badbg:#37181F; --pendbg:#1F2533; color-scheme:dark}
+
+body{background-color:var(--paper);background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:22px 22px;color:var(--ink);font:16px/1.55 var(--f-body);padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:10px 56px}
+.wrap{max-width:720px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
+h1,h2,h3{font-family:var(--f-disp);text-wrap:balance;margin:0;line-height:1.15}
+p{margin:0}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--pen);outline-offset:2px}
+
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:48px}
+.brand{font:800 26px var(--f-disp);letter-spacing:-.02em}
+.brand span{background:linear-gradient(transparent 58%,var(--fluor) 58%,var(--fluor) 92%,transparent 92%);padding:0 2px}
+.seg{display:inline-flex;border:1.5px solid var(--line);border-radius:8px;overflow:hidden;background:var(--card)}
+.seg button{border:0;background:transparent;padding:8px 13px;font-weight:700;font-size:14px;cursor:pointer;min-height:38px}
+.seg button[aria-pressed="true"]{background:var(--pen);color:var(--on-pen)}
+.seg button+button{border-left:1.5px solid var(--line)}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:46px;padding:10px 18px;border-radius:8px;border:1.5px solid var(--line);background:var(--card);font-weight:700;font-size:15px;cursor:pointer;text-decoration:none;color:var(--ink);text-align:center}
+.btn.pri{background:var(--pen);border-color:var(--pen);color:var(--on-pen)}
+.btn.small{min-height:38px;padding:6px 12px;font-size:14px}
+.btn.wide{width:100%}
+.btn.danger{color:var(--red);border-color:var(--red)}
+.btn:disabled{opacity:.5;cursor:default}
+.ghost{border:0;background:transparent;font-weight:700;color:var(--pen);cursor:pointer;padding:8px 0;min-height:44px;font-size:15px}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px;display:flex;flex-direction:column;gap:14px;min-width:0}
+.hero{display:flex;flex-direction:column;gap:10px;padding-block:14px 6px}
+.hero h1{font-size:clamp(30px,7vw,44px);font-weight:800;letter-spacing:-.025em}
+.lead{color:var(--muted);font-size:17px;max-width:46ch}
+.sec{font-size:13px;font-family:var(--f-body);font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.help{color:var(--muted);font-size:15px;max-width:62ch}
+.fine{color:var(--muted);font-size:13px}
+.empty{color:var(--muted);text-align:left;padding:4px 0}
+
+.list{display:flex;flex-direction:column;gap:10px}
+.tcard{display:flex;flex-direction:column;gap:6px;text-align:left;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;cursor:pointer;width:100%}
+.tcard:hover{border-color:var(--pen)}
+.tcard h3{font-size:19px;font-weight:600}
+.meta{display:flex;flex-wrap:wrap;gap:6px;font-size:13px;color:var(--muted)}
+.chip{display:inline-flex;align-items:center;padding:2px 9px;border-radius:999px;background:var(--pendbg);font-size:13px;color:var(--muted);font-weight:700}
+.chip.ex{background:var(--fluor);color:var(--ink)}
+.prog{display:flex;gap:14px;flex-wrap:wrap;font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+.prog b{color:var(--ink)}
+
+.form label{display:flex;flex-direction:column;gap:6px;font-weight:700;font-size:14px}
+.form input,.form select,textarea.paste{border:1.5px solid var(--line);border-radius:8px;padding:11px 12px;background:var(--paper);font-weight:400;font-size:16px;width:100%}
+.form fieldset{border:0;padding:0;margin:0;display:flex;flex-direction:column;gap:6px}
+.form legend{font-weight:700;font-size:14px;padding:0;margin-bottom:6px}
+textarea.paste{min-height:150px;resize:vertical;font-size:15px;line-height:1.45}
+
+.thead{display:flex;flex-direction:column;gap:4px}
+.thead h1{font-size:clamp(26px,6vw,34px);font-weight:800;letter-spacing:-.02em}
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.steps button{display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 2px;border:1.5px solid var(--line);border-radius:10px;background:var(--card);cursor:pointer;font-size:13px;font-weight:700;min-width:0}
+.steps .n{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;border:1.5px solid var(--line);font-size:13px;font-variant-numeric:tabular-nums}
+.steps .done .n{background:var(--okbg);border-color:var(--ok);color:var(--ok)}
+.steps button[aria-current="step"]{border-color:var(--pen);background:var(--pen-soft)}
+.steps button[aria-current="step"] .n{background:var(--pen);border-color:var(--pen);color:var(--on-pen)}
+.steps .lbl{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+.thumbs{display:grid;grid-template-columns:repeat(auto-fill,minmax(88px,1fr));gap:10px}
+.th{position:relative;margin:0;aspect-ratio:3/4;border-radius:8px;overflow:hidden;border:1px solid var(--line);background:var(--paper);max-width:100%}
+.th img{width:100%;height:100%;object-fit:cover;display:block}
+.th figcaption{position:absolute;left:6px;bottom:6px;background:var(--card);color:var(--ink);font-size:12px;font-weight:700;padding:1px 7px;border-radius:999px}
+.th .x{position:absolute;top:4px;right:4px;width:32px;height:32px;border-radius:50%;border:0;background:var(--card);color:var(--red);font-size:20px;line-height:1;cursor:pointer}
+
+.pblock h2{font-size:20px;font-weight:600}
+.how{margin:0;padding-left:22px;display:flex;flex-direction:column;gap:4px;font-size:15px}
+details summary{cursor:pointer;color:var(--pen);font-weight:700;font-size:14px;padding:4px 0}
+textarea.pt{width:100%;min-height:220px;font:12.5px/1.5 var(--f-mono);border:1px solid var(--line);border-radius:8px;padding:10px;background:var(--paper);resize:vertical;margin-top:8px}
+
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:13px;color:var(--muted)}
+.notes{font-size:16.5px;line-height:1.65;max-width:68ch;overflow-wrap:anywhere}
+.notes h2{font-size:26px;font-weight:800;margin:18px 0 6px}
+.notes h3{font-size:20px;font-weight:600;margin:16px 0 4px}
+.notes h4,.notes h5{font-size:17px;font-family:var(--f-body);font-weight:700;margin:12px 0 2px}
+.notes > :first-child{margin-top:0}
+.notes p{margin:6px 0}
+.notes ul,.notes ol{margin:6px 0;padding-left:22px}
+.notes li{margin:3px 0}
+.notes blockquote{margin:8px 0;padding:6px 12px;border-left:3px solid var(--line);color:var(--muted)}
+.notes hr{border:0;border-top:1px dashed var(--line);margin:14px 0}
+mark{background:var(--fluor);color:inherit;padding:0 2px;border-radius:2px}
+del{color:var(--muted);text-decoration-color:var(--red);text-decoration-thickness:2px}
+.k-add{background:var(--fluor);padding:0 5px;border-radius:2px;color:var(--ink)}
+.k-fix{color:var(--red);font-weight:700}
+
+.tipos{display:flex;flex-wrap:wrap;gap:8px}
+.tog{border:1.5px solid var(--line);background:var(--card);border-radius:999px;padding:8px 14px;font-weight:700;font-size:14px;cursor:pointer;min-height:42px}
+.tog[aria-pressed="true"]{border-color:var(--pen);background:var(--pen-soft);color:var(--pen)}
+.field{display:flex;flex-direction:column;gap:8px}
+.flabel{font-weight:700;font-size:14px}
+select.sel{border:1.5px solid var(--line);border-radius:8px;padding:10px 12px;background:var(--paper);font-size:16px;max-width:140px}
+.err{color:var(--red);font-size:14px;font-weight:700}
+.resume{background:var(--pen-soft);border-color:var(--pen)}
+
+.hrow{display:grid;grid-template-columns:1fr auto;gap:8px 12px;align-items:center;padding:12px 0;border-top:1px solid var(--line)}
+.hrow:first-child{border-top:0;padding-top:0}
+.hrow .row{grid-column:1/-1}
+.nota{font:800 22px var(--f-disp);font-variant-numeric:tabular-nums;padding:2px 12px;border-radius:8px;min-width:56px;text-align:center}
+.nota.ok{background:var(--okbg);color:var(--ok)} .nota.bad{background:var(--badbg);color:var(--red)} .nota.pend{background:var(--pendbg);color:var(--muted);font-size:16px}
+
+.score{display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+.score .big{font:800 60px/1 var(--f-disp);font-variant-numeric:tabular-nums;letter-spacing:-.03em}
+.score .big.ok{color:var(--ok)} .score .big.bad{color:var(--red)} .score .big.pend{color:var(--muted)}
+.q{gap:12px}
+.qhead{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.qlab{font-size:12.5px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted)}
+.qtext{font-size:17px;font-weight:700;line-height:1.45;overflow-wrap:anywhere}
+.pill{font-size:12.5px;font-weight:700;padding:3px 10px;border-radius:999px}
+.pill.ok{background:var(--okbg);color:var(--ok)} .pill.part{background:var(--warnbg);color:var(--warn)} .pill.bad{background:var(--badbg);color:var(--red)} .pill.pend{background:var(--pendbg);color:var(--muted)}
+.opts{display:flex;flex-direction:column;gap:8px}
+.opt{display:flex;gap:12px;align-items:flex-start;text-align:left;border:1.5px solid var(--line);background:var(--card);border-radius:10px;padding:11px 12px;cursor:pointer;font-size:16px;min-height:46px;width:100%}
+.opt .l{flex:none;width:26px;height:26px;border-radius:50%;border:1.5px solid var(--line);display:grid;place-items:center;font-size:13px;font-weight:700}
+.opt[aria-pressed="true"]{border-color:var(--pen);background:var(--pen-soft)}
+.opt[aria-pressed="true"] .l{background:var(--pen);color:var(--on-pen);border-color:var(--pen)}
+.opt.ok{border-color:var(--ok);background:var(--okbg)} .opt.ok .l{border-color:var(--ok);color:var(--ok);background:transparent}
+.opt.bad{border-color:var(--red);background:var(--badbg)} .opt.bad .l{border-color:var(--red);color:var(--red);background:transparent}
+.opt:disabled{cursor:default;opacity:1}
+.vf{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.vf .opt{justify-content:center}
+.hole{width:9em;max-width:100%;border:0;border-bottom:2px dashed var(--pen);background:var(--pen-soft);padding:2px 6px;font-size:16px;font-weight:700;border-radius:4px 4px 0 0}
+.hole.ok{border-bottom-color:var(--ok);background:var(--okbg)} .hole.bad{border-bottom-color:var(--red);background:var(--badbg)}
+.huecos{font-size:17px;line-height:2.1;overflow-wrap:anywhere}
+textarea.ans{width:100%;border:1.5px solid var(--line);border-radius:8px;padding:10px 12px;background:var(--paper);font-size:16px;line-height:1.5;resize:vertical}
+.fb{border-radius:8px;padding:10px 12px;font-size:15px;display:flex;flex-direction:column;gap:6px;background:var(--pendbg)}
+.fb.ok{background:var(--okbg)} .fb.part{background:var(--warnbg)} .fb.bad{background:var(--badbg)}
+.fb b{font-weight:700}
+.fb .model{white-space:pre-wrap}
+
+.search{width:100%;border:1.5px solid var(--line);border-radius:8px;padding:11px 12px;background:var(--card);font-size:16px}
+.pchip{display:inline-flex;align-items:center;gap:6px;border:1.5px solid var(--line);background:var(--card);border-radius:999px;padding:4px 12px 4px 4px;font-weight:700;font-size:14px;cursor:pointer;min-height:38px;max-width:44vw;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.av{display:inline-grid;place-items:center;width:28px;height:28px;border-radius:50%;background:var(--pen);color:var(--on-pen);font-weight:800;font-size:13px;flex:none}
+.av.big{width:36px;height:36px;font-size:16px;vertical-align:middle}
+.agrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.acard{display:flex;flex-direction:column;align-items:flex-start;gap:6px;text-align:left;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;cursor:pointer;min-width:0}
+.acard:hover{border-color:var(--pen)}
+.aname{font:600 17px/1.25 var(--f-disp);overflow-wrap:anywhere}
+.ameta{font-size:13px;color:var(--muted)}
+.acard .nota{font-size:18px;margin-top:auto}
+.rrow{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;text-align:left;background:transparent;border:0;border-top:1px solid var(--line);padding:10px 0;cursor:pointer;width:100%;font-size:15px}
+.rrow:first-child{border-top:0;padding-top:0}
+.egrp{display:flex;flex-direction:column;gap:10px}
+.egrp>summary{display:flex;justify-content:space-between;align-items:center;font:600 18px var(--f-disp);color:var(--ink);padding:6px 0;border-bottom:2px solid var(--line);margin-bottom:10px;list-style:none}
+.egrp>summary::-webkit-details-marker{display:none}
+.tcard h3{min-width:0;overflow-wrap:anywhere}
+.callout{border:1.5px solid var(--line);border-radius:10px;padding:12px 14px;margin:12px 0;background:var(--pendbg);display:flex;flex-direction:column;gap:2px}
+.callout>:last-child{margin-bottom:0}
+.ctitle{font-size:12.5px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted)}
+.c-formula{background:var(--pen-soft);border-color:var(--pen)} .c-formula .ctitle{color:var(--pen)}
+.c-ejemplo{background:var(--okbg);border-color:var(--ok)} .c-ejemplo .ctitle{color:var(--ok)}
+.c-error{background:var(--badbg);border-color:var(--red)} .c-error .ctitle{color:var(--red)}
+.c-importante{background:var(--warnbg);border-color:var(--warn)} .c-importante .ctitle{color:var(--warn)}
+.tbl{overflow-x:auto;margin:10px 0;max-width:100%}
+.tbl table{border-collapse:collapse;font-size:15px;min-width:60%}
+.tbl th,.tbl td{border:1px solid var(--line);padding:6px 10px;text-align:left;vertical-align:top}
+.tbl th{background:var(--pendbg);font-weight:700}
+.callout .tbl th{background:var(--card)}
+.mblock{overflow-x:auto;margin:10px 0;text-align:center;font-size:1.15em}
+math{font-size:1.08em}
+code.tex{font:13.5px var(--f-mono);background:var(--pendbg);padding:1px 5px;border-radius:4px}
+code.tex.disp{display:inline-block}
+.fig{background:#FFFFFF;border:1px solid var(--line);border-radius:10px;padding:10px;margin:12px 0;text-align:center}
+.fig img{max-width:100%;height:auto;display:inline-block}
+pre.code{overflow-x:auto;background:var(--pendbg);padding:10px 12px;border-radius:8px;font:13px/1.5 var(--f-mono)}
+.qtext math,.opt math{font-size:1em}
+#toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(20px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--paper);padding:10px 16px;border-radius:8px;font-weight:700;font-size:14px;max-width:calc(100% - 32px);z-index:20;text-align:center}
+@media (prefers-reduced-motion: no-preference){.tcard,.opt,.tog,.btn{transition:border-color .15s,background-color .15s}}
+#burst{position:fixed;inset:0;z-index:40;background:#000;display:flex;flex-direction:column}
+#burst .bstage{flex:1;position:relative;min-height:0}
+#bVid,#bOv{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}
+#bOv{pointer-events:none}
+#bFlash{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none}
+#bFlash.go{animation:bfl .25s ease-out}
+@keyframes bfl{from{opacity:.8}to{opacity:0}}
+#burst .bbar{display:flex;align-items:center;justify-content:space-between;padding:16px 20px calc(18px + env(safe-area-inset-bottom,0px));background:#000}
+#burst .bleft{width:96px;display:flex;align-items:center;gap:8px;color:#fff;font-weight:700;font-size:15px}
+#bThumb{width:44px;height:58px;object-fit:cover;border-radius:6px;border:2px solid #fff}
+#bShot{width:76px;height:76px;border-radius:50%;border:5px solid #fff;background:#fff;box-shadow:inset 0 0 0 4px #000;cursor:pointer}
+#bShot:active{transform:scale(.92)}
+#bDone{width:96px;background:#2348B8;color:#fff;border:0;border-radius:10px;padding:12px 0;font-weight:700;font-size:15px;cursor:pointer}
+</style>
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}[hidden]{display:none!important}img{max-width:100%}</style>
+</head>
+<body>
+
+<div id="app" class="wrap"><header class="top"><div class="brand"><span>Ikasi</span></div></header></div>
+<div id="toast" role="status" aria-live="polite" hidden></div>
+
+<script>
+(function(){
+"use strict";
+
+/* ---------- Textos ES / EU ---------- */
+const T = {
+es:{
+  tagline:"Escanea tus apuntes, deja que la IA los complete y corrija, y ponte a prueba con un examen.",
+  hero:"Estudia con tus propios apuntes", nuevoTema:"Nuevo tema", misTemas:"Mis temas",
+  vacio:"Todavía no hay temas. Crea el primero para empezar.", ejemplo:"Ejemplo",
+  titulo:"Título del tema", tituloPh:"Ej.: La célula", curso:"Curso", materia:"Asignatura", materiaPh:"Elige una asignatura", otraMat:"Otra (escríbela)", quien:"¿Quién estudia?", nuevoPerfil:"Añadir estudiante", nombre:"Nombre", guardar:"Guardar", entrar:"Entrar", borrarPerfil:"Borrar estudiante", confirmarPerfil:"Se borrarán este estudiante y todos sus temas, apuntes y exámenes.", cambiarPerfil:"Cambiar de estudiante", hola:"Hola, {n}", tema1:"1 tema", temasN:"{n} temas", media:"Media", paraRepasar:"Para repasar", rp_medias:"Examen a medias", rp_susp:"Suspendido ({n})", rp_fallos:"{n} fallos por repasar", rp_tiempo:"Hace tiempo que no lo repasas", buscarPh:"Buscar tema o asignatura", ordenar:"Ordenar", o_recientes:"Más recientes", o_alfa:"Alfabético", o_nota:"Nota más baja", f_todos:"Todos", f_sinApuntes:"Sin apuntes", f_sinExamen:"Sin examen", f_aMedias:"A medias", f_suspendidos:"Suspendidos", f_conFallos:"Con fallos", sinResultados:"No hay temas que coincidan.", vacioCurso:"Aún no hay temas en este curso. Crea el primero con «Nuevo tema».", vacioAsig:"Aún no hay temas en esta asignatura.", evalN:"{n}.ª evaluación", evN:"{n}.ª ev.", sinEval:"Sin evaluación", evaluacion:"Evaluación", archivar:"Archivar", desarchivar:"Recuperar", archivados:"Archivados", verArchivados:"Ver archivados ({n})", sinArchivados:"No hay temas archivados.", archivado:"Tema archivado", recuperado:"Tema recuperado", volverAsig:"Volver a la asignatura", innoLbl:"Mi centro usa Innovamat", innoHelp:"Los apuntes y exámenes seguirán su enfoque: materiales, varias estrategias y explicar cómo se piensa.", modoQ:"¿Tienes apuntes?", modoFotos:"Sí, los escaneo", modoCurr:"No, que los prepare Claude", temaCurr:"Tema del currículo", temaLibre:"Escribir el título a mano", currHelp:"No hace falta escanear: copia el prompt y Claude preparará los apuntes de «{t}» según el currículo vasco.", p0Title:"Prompt para crear los apuntes", p0How:["Copia el prompt.","Abre Claude y pégalo.","Copia la respuesta y pégala en «Apuntes»."], s_prep:"Preparar", conFotos:"Con fotos", sinApuntesM:"Sin apuntes",
+  idioma:"Idioma de los apuntes", eus:"Euskera", cas:"Castellano", crear:"Crear tema", cancelar:"Cancelar", volver:"Volver",
+  s_scan:"Escanear", s_notes:"Apuntes", s_exam:"Examen", s_hist:"Historial",
+  fotos:"{n} fotos", foto1:"1 foto", apuntesOk:"Apuntes listos", sinApuntes:"Sin apuntes", examenes:"{n} exámenes", examen1:"1 examen", ultimaNota:"Última nota",
+  scanHelp:"Pulsa «Escanear páginas» y haz una foto por página, en orden, con buena luz y la hoja entera. Cada página se recorta y se aclara sola. Para adjuntarlas en Claude, usa «Compartir fotos».",
+  camara:"Escanear páginas", hecho:"Hecho ✓", disparar:"Hacer foto", nPag:"{n} páginas añadidas", camFail:"No se ha podido abrir la cámara. Revisa el permiso de cámara del navegador o usa «Elegir de la galería».", galeria:"Elegir de la galería", pagina:"Página", borrar:"Quitar", procesando:"Procesando fotos…",
+  compartirFotos:"Compartir fotos", shareFail:"Desde aquí no se pueden compartir. Adjunta las fotos desde tu galería.",
+  p1Title:"Prompt para corregir y completar",
+  p1How:["Copia el prompt.","Abre Claude y pégalo.","Adjunta las mismas fotos, en el mismo orden.","Copia la respuesta y pégala en «Apuntes»."],
+  copiar:"Copiar prompt", copiado:"Copiado", copiaManual:"Selecciona el texto y cópialo a mano", abrirClaude:"Abrir Claude", verPrompt:"Ver el prompt",
+  sigApuntes:"Siguiente: pegar apuntes", sigExamen:"Siguiente: preparar examen",
+  pegaApuntes:"Pega aquí la respuesta de Claude con los apuntes", guardarApuntes:"Guardar apuntes", editar:"Editar", guardado:"Guardado",
+  leyAdd:"Añadido", leyFix:"Corregido", noApuntes:"Primero guarda los apuntes en el paso 2.", irApuntes:"Ir a apuntes",
+  tipos:"Tipos de pregunta", t_test:"Tipo test", t_vf:"Verdadero / falso", t_huecos:"Rellenar huecos", t_corta:"Respuesta corta", t_desarrollo:"Desarrollo",
+  numero:"Número de preguntas", dificultad:"Dificultad", facil:"Fácil", media:"Media", dificil:"Difícil", minTipo:"Elige al menos un tipo de pregunta.",
+  p2Title:"Prompt para crear el examen",
+  p2How:["Copia el prompt (ya lleva tus apuntes dentro).","Pégalo en Claude.","Copia la respuesta entera y pégala aquí debajo."],
+  pegaExamen:"Pega aquí el examen que te ha dado Claude", empezar:"Empezar examen",
+  errJson:"No he podido leer el examen. Copia la respuesta entera de Claude, incluido el bloque que empieza por { y acaba en }.",
+  errVacio:"El examen no tiene preguntas válidas. Pide a Claude que lo genere otra vez.",
+  enCurso:"Tienes un examen a medias", seguir:"Seguir",
+  histVacio:"Aún no has hecho ningún examen de este tema.", ver:"Ver", repetir:"Repetir", fallos:"Repasar fallos", nFallos:"{n} fallos",
+  o_nuevo:"Examen", o_repetir:"Repetición", o_fallos:"Repaso de fallos", preguntas:"preguntas",
+  pregunta:"Pregunta", corregir:"Corregir examen", sinResponder:"Te quedan {n} preguntas sin responder. Puedes corregir igualmente.",
+  nota:"Nota", provisional:"Provisional: faltan respuestas escritas por corregir", aciertos:"{a} de {n} bien",
+  ok:"Bien", part:"A medias", bad:"Mal", pend:"Por corregir", verdadero:"Verdadero", falso:"Falso",
+  correctaEra:"La respuesta correcta era", correctas:"Respuestas correctas", explicacion:"Explicación", modelo:"Respuesta modelo", comentario:"Comentario",
+  tuRespuesta:"Escribe tu respuesta",
+  p3Title:"Corregir las respuestas escritas", p3How:["Copia el prompt y pégalo en Claude.","Copia su respuesta y pégala aquí.","Pulsa «Aplicar corrección»."],
+  pegaCorr:"Pega aquí la corrección de Claude", aplicar:"Aplicar corrección", errCorr:"No he podido leer la corrección. Copia la respuesta entera de Claude.",
+  autoeval:"O corrígela tú comparando con la respuesta modelo:", volverTema:"Volver al tema",
+  borrarTema:"Borrar tema", confirmar:"Se borrarán las fotos, los apuntes y los exámenes de este tema.", siBorrar:"Sí, borrar", borrado:"Tema borrado",
+  bkFotos:"Incluir las fotos (el archivo pesa más)", bkDescargar:"Descargar copia", bkCompartir:"Enviar copia (Drive, correo…)", bkRestaurar:"Restaurar desde archivo", bkPend:"Tienes cambios sin copia de seguridad", bkPendHelp:"Los datos solo están en este navegador. Descarga una copia para no perderlos.", bkNunca:"Aún no has hecho ninguna copia.", bkUltima:"Última copia: {f}", bkOk:"Copia descargada", bkRest:"Restaurados {n} temas", bkPersist:"El navegador protege los datos para que no se borren solos.", backup:"Copia de seguridad", backupHelp:"Guarda en un archivo tus temas, apuntes, exámenes y notas. Con ese archivo puedes recuperarlo todo en este u otro móvil.",
+  copiarDatos:"Copiar datos", restaurar:"Restaurar", restaurado:"Datos restaurados", errRestore:"Ese texto no es una copia válida.",
+  storageNote:"Todo se guarda solo en este navegador y este dispositivo.", noStorage:"Este navegador no deja guardar datos: lo que hagas se perderá al cerrar.",
+  noEnviado:"Sin responder",
+  descargar:"Descargar", examenBlanco:"Examen en blanco", preparando:"Preparando el archivo…", exportFail:"No se ha podido crear el archivo. Revisa la conexión e inténtalo otra vez.",
+  descargado:"Archivo listo", nombre:"Nombre", fechaL:"Fecha", apuntesDe:"Apuntes",
+  soloUno:"Estos apuntes solo están en {l}. Para tenerlos en los dos idiomas, vuelve a usar el prompt del paso 1.",
+  soloUnoEx:"Este examen solo está en {l}.", noDescarga:"Aquí no se pueden descargar archivos. Usa la versión HTML descargable."
+},
+eu:{
+  tagline:"Eskaneatu zure apunteak, utzi AAri osatzen eta zuzentzen, eta jarri zeure burua proban azterketa batekin.",
+  hero:"Ikasi zure apunteekin", nuevoTema:"Gai berria", misTemas:"Nire gaiak",
+  vacio:"Oraindik ez dago gairik. Sortu lehenengoa hasteko.", ejemplo:"Adibidea",
+  titulo:"Gaiaren izenburua", tituloPh:"Adib.: Zelula", curso:"Maila", materia:"Irakasgaia", materiaPh:"Aukeratu irakasgai bat", otraMat:"Beste bat (idatzi)", quien:"Nor ari da ikasten?", nuevoPerfil:"Ikaslea gehitu", nombre:"Izena", guardar:"Gorde", entrar:"Sartu", borrarPerfil:"Ikaslea ezabatu", confirmarPerfil:"Ikasle hau eta haren gai, apunte eta azterketa guztiak ezabatuko dira.", cambiarPerfil:"Ikaslez aldatu", hola:"Kaixo, {n}", tema1:"Gai 1", temasN:"{n} gai", media:"Batez bestekoa", paraRepasar:"Errepasatzeko", rp_medias:"Azterketa erdizka", rp_susp:"Ez gainditua ({n})", rp_fallos:"{n} huts errepasatzeko", rp_tiempo:"Aspaldi ez duzu errepasatu", buscarPh:"Bilatu gaia edo irakasgaia", ordenar:"Ordenatu", o_recientes:"Berrienak", o_alfa:"Alfabetikoki", o_nota:"Nota baxuena", f_todos:"Guztiak", f_sinApuntes:"Apunterik gabe", f_sinExamen:"Azterketarik gabe", f_aMedias:"Erdizka", f_suspendidos:"Ez gaindituak", f_conFallos:"Hutsekin", sinResultados:"Ez dago bat datorren gairik.", vacioCurso:"Oraindik ez dago gairik maila honetan. Sortu lehenengoa «Gai berria» botoiarekin.", vacioAsig:"Oraindik ez dago gairik irakasgai honetan.", evalN:"{n}. ebaluazioa", evN:"{n}. eb.", sinEval:"Ebaluaziorik gabe", evaluacion:"Ebaluazioa", archivar:"Artxibatu", desarchivar:"Berreskuratu", archivados:"Artxibatuak", verArchivados:"Artxibatuak ikusi ({n})", sinArchivados:"Ez dago gai artxibaturik.", archivado:"Gaia artxibatuta", recuperado:"Gaia berreskuratuta", volverAsig:"Irakasgaira itzuli", innoLbl:"Nire ikastetxeak Innovamat erabiltzen du", innoHelp:"Apunteek eta azterketek haren ikuspegia jarraituko dute: materialak, hainbat estrategia eta nola pentsatu den azaltzea.", modoQ:"Baduzu apunterik?", modoFotos:"Bai, eskaneatuko ditut", modoCurr:"Ez, Claudek presta ditzala", temaCurr:"Curriculumeko gaia", temaLibre:"Izenburua eskuz idatzi", currHelp:"Ez da eskaneatu behar: kopiatu prompta, eta Claudek «{t}» gaiaren apunteak prestatuko ditu euskal curriculumaren arabera.", p0Title:"Apunteak sortzeko prompta", p0How:["Kopiatu prompta.","Ireki Claude eta itsatsi.","Kopiatu erantzuna eta itsatsi «Apunteak» atalean."], s_prep:"Prestatu", conFotos:"Argazkiekin", sinApuntesM:"Apunterik gabe",
+  idioma:"Apunteen hizkuntza", eus:"Euskara", cas:"Gaztelania", crear:"Gaia sortu", cancelar:"Utzi", volver:"Itzuli",
+  s_scan:"Eskaneatu", s_notes:"Apunteak", s_exam:"Azterketa", s_hist:"Historia",
+  fotos:"{n} argazki", foto1:"Argazki 1", apuntesOk:"Apunteak prest", sinApuntes:"Apunterik gabe", examenes:"{n} azterketa", examen1:"Azterketa 1", ultimaNota:"Azken nota",
+  scanHelp:"Sakatu «Orrialdeak eskaneatu» eta atera argazki bat orrialde bakoitzeko, ordenan, argi onarekin eta orri osoa. Orrialde bakoitza bere kabuz moztu eta argitzen da. Claudera eransteko, erabili «Argazkiak partekatu».",
+  camara:"Orrialdeak eskaneatu", hecho:"Eginda ✓", disparar:"Argazkia atera", nPag:"{n} orrialde gehituta", camFail:"Ezin izan da kamera ireki. Egiaztatu nabigatzailearen kamera-baimena edo erabili «Galeriatik aukeratu».", galeria:"Galeriatik aukeratu", pagina:"Orrialdea", borrar:"Kendu", procesando:"Argazkiak prozesatzen…",
+  compartirFotos:"Argazkiak partekatu", shareFail:"Hemendik ezin da partekatu. Erantsi argazkiak zure galeriatik.",
+  p1Title:"Zuzentzeko eta osatzeko prompta",
+  p1How:["Kopiatu prompta.","Ireki Claude eta itsatsi.","Erantsi argazki berberak, ordena berean.","Kopiatu erantzuna eta itsatsi «Apunteak» atalean."],
+  copiar:"Prompta kopiatu", copiado:"Kopiatuta", copiaManual:"Hautatu testua eta kopiatu eskuz", abrirClaude:"Claude ireki", verPrompt:"Prompta ikusi",
+  sigApuntes:"Hurrengoa: apunteak itsatsi", sigExamen:"Hurrengoa: azterketa prestatu",
+  pegaApuntes:"Itsatsi hemen Clauderen erantzuna apunteekin", guardarApuntes:"Apunteak gorde", editar:"Editatu", guardado:"Gordeta",
+  leyAdd:"Gehitua", leyFix:"Zuzendua", noApuntes:"Lehenik gorde apunteak 2. urratsean.", irApuntes:"Apunteetara joan",
+  tipos:"Galdera motak", t_test:"Test motakoa", t_vf:"Egia / gezurra", t_huecos:"Hutsuneak bete", t_corta:"Erantzun laburra", t_desarrollo:"Garapena",
+  numero:"Galdera kopurua", dificultad:"Zailtasuna", facil:"Erraza", media:"Ertaina", dificil:"Zaila", minTipo:"Aukeratu galdera mota bat gutxienez.",
+  p2Title:"Azterketa sortzeko prompta",
+  p2How:["Kopiatu prompta (zure apunteak barruan ditu).","Itsatsi Clauden.","Kopiatu erantzun osoa eta itsatsi hemen behean."],
+  pegaExamen:"Itsatsi hemen Claudek emandako azterketa", empezar:"Azterketa hasi",
+  errJson:"Ezin izan dut azterketa irakurri. Kopiatu Clauderen erantzun osoa, { ikurrarekin hasi eta } ikurrarekin amaitzen den blokea barne.",
+  errVacio:"Azterketak ez du galdera baliozkorik. Eskatu Claudeari berriro sortzeko.",
+  enCurso:"Azterketa bat erdizka duzu", seguir:"Jarraitu",
+  histVacio:"Oraindik ez duzu gai honen azterketarik egin.", ver:"Ikusi", repetir:"Errepikatu", fallos:"Hutsak errepasatu", nFallos:"{n} huts",
+  o_nuevo:"Azterketa", o_repetir:"Errepikapena", o_fallos:"Hutsen errepasoa", preguntas:"galdera",
+  pregunta:"Galdera", corregir:"Azterketa zuzendu", sinResponder:"{n} galdera erantzun gabe dituzu. Hala ere zuzendu dezakezu.",
+  nota:"Nota", provisional:"Behin-behinekoa: idatzizko erantzunak zuzentzeke daude", aciertos:"{n}tik {a} ondo",
+  ok:"Ondo", part:"Erdizka", bad:"Gaizki", pend:"Zuzentzeke", verdadero:"Egia", falso:"Gezurra",
+  correctaEra:"Erantzun zuzena hau zen", correctas:"Erantzun zuzenak", explicacion:"Azalpena", modelo:"Eredu-erantzuna", comentario:"Iruzkina",
+  tuRespuesta:"Idatzi zure erantzuna",
+  p3Title:"Idatzizko erantzunak zuzendu", p3How:["Kopiatu prompta eta itsatsi Clauden.","Kopiatu haren erantzuna eta itsatsi hemen.","Sakatu «Zuzenketa aplikatu»."],
+  pegaCorr:"Itsatsi hemen Clauderen zuzenketa", aplicar:"Zuzenketa aplikatu", errCorr:"Ezin izan dut zuzenketa irakurri. Kopiatu Clauderen erantzun osoa.",
+  autoeval:"Edo zuzendu zeuk, eredu-erantzunarekin alderatuz:", volverTema:"Gaira itzuli",
+  borrarTema:"Gaia ezabatu", confirmar:"Gai honetako argazkiak, apunteak eta azterketak ezabatuko dira.", siBorrar:"Bai, ezabatu", borrado:"Gaia ezabatuta",
+  bkFotos:"Argazkiak barne (fitxategiak gehiago pisatzen du)", bkDescargar:"Kopia deskargatu", bkCompartir:"Kopia bidali (Drive, posta…)", bkRestaurar:"Fitxategitik leheneratu", bkPend:"Segurtasun-kopiarik gabeko aldaketak dituzu", bkPendHelp:"Datuak nabigatzaile honetan bakarrik daude. Deskargatu kopia bat ez galtzeko.", bkNunca:"Oraindik ez duzu kopiarik egin.", bkUltima:"Azken kopia: {f}", bkOk:"Kopia deskargatuta", bkRest:"{n} gai leheneratuta", bkPersist:"Nabigatzaileak datuak babesten ditu bere kabuz ez ezabatzeko.", backup:"Segurtasun-kopia", backupHelp:"Gorde fitxategi batean zure gaiak, apunteak, azterketak eta notak. Fitxategi horrekin dena berreskura dezakezu mugikor honetan edo beste batean.",
+  copiarDatos:"Datuak kopiatu", restaurar:"Leheneratu", restaurado:"Datuak leheneratuta", errRestore:"Testu hori ez da kopia baliozkoa.",
+  storageNote:"Dena nabigatzaile eta gailu honetan bakarrik gordetzen da.", noStorage:"Nabigatzaile honek ez du datuak gordetzen uzten: egiten duzuna galdu egingo da ixtean.",
+  noEnviado:"Erantzun gabe",
+  descargar:"Deskargatu", examenBlanco:"Azterketa hutsik", preparando:"Fitxategia prestatzen…", exportFail:"Ezin izan da fitxategia sortu. Egiaztatu konexioa eta saiatu berriro.",
+  descargado:"Fitxategia prest", nombre:"Izena", fechaL:"Data", apuntesDe:"Apunteak",
+  soloUno:"Apunte hauek {l} bakarrik daude. Bi hizkuntzetan izateko, erabili berriro 1. urratseko prompta.",
+  soloUnoEx:"Azterketa hau {l} bakarrik dago.", noDescarga:"Hemen ezin da fitxategirik deskargatu. Erabili HTML bertsio deskargagarria."
+}};
+
+const CURSOS=[
+  {id:"lh3",es:"3º de Primaria",eu:"LH 3. maila"},{id:"lh4",es:"4º de Primaria",eu:"LH 4. maila"},
+  {id:"lh5",es:"5º de Primaria",eu:"LH 5. maila"},{id:"lh6",es:"6º de Primaria",eu:"LH 6. maila"},
+  {id:"dbh1",es:"1º de ESO",eu:"DBH 1"},{id:"dbh2",es:"2º de ESO",eu:"DBH 2"},{id:"dbh3",es:"3º de ESO",eu:"DBH 3"},{id:"dbh4",es:"4º de ESO",eu:"DBH 4"},
+  {id:"bat1",es:"1º de Bachillerato",eu:"Batxilergoa 1"},{id:"bat2",es:"2º de Bachillerato",eu:"Batxilergoa 2"}];
+/* Asignaturas según el Decreto 77/2023 (Educación Básica) y el Decreto 76/2023 (Bachillerato) de Euskadi. [es, eu] */
+const M={
+  eus:["Lengua Vasca y Literatura","Euskara eta Literatura"], cas:["Lengua Castellana y Literatura","Gaztelania eta Literatura"],
+  ing:["Inglés (Primera lengua extranjera)","Ingelesa (Atzerriko lehen hizkuntza)"], mat:["Matemáticas","Matematika"],
+  medio:["Conocimiento del Medio Natural, Social y Cultural","Natura, Gizarte eta Kultura Ingurunearen Ezagutza"],
+  art:["Educación Artística","Hezkuntza Artistikoa"], mus:["Música","Musika"], plas:["Plástica","Plastika"], ef:["Educación Física","Gorputz Hezkuntza"],
+  val:["Valores Cívicos y Éticos","Balio Zibiko eta Etikoak"], fr:["Francés (Segunda lengua extranjera)","Frantsesa (Atzerriko bigarren hizkuntza)"],
+  cn:["Ciencias de la Naturaleza","Natura Zientziak"], gh:["Geografía e Historia","Geografia eta Historia"],
+  epv:["Educación Plástica y Audiovisual","Hezkuntza Plastikoa eta Ikus-entzunezkoa"], bien:["Bienestar Físico y Emocional","Ongizate Fisiko eta Emozionala"],
+  itd:["Iniciación a la Tecnología y la Digitalización","Teknologiarako eta Digitalizaziorako Hastapena"], td:["Tecnología y Digitalización","Teknologia eta Digitalizazioa"],
+  ipc:["Iniciación al Pensamiento Crítico y Autónomo","Pentsamendu Kritiko eta Autonomorako Hastapena"],
+  bg:["Biología y Geología","Biologia eta Geologia"], fq:["Física y Química","Fisika eta Kimika"],
+  ccl:["Cultura Clásica","Kultura Klasikoa"], ccie:["Cultura Científica","Kultura Zientifikoa"], expa:["Expresión Artística","Adierazpen Artistikoa"],
+  matA:["Matemáticas A","Matematika A"], matB:["Matemáticas B","Matematika B"], lat:["Latín","Latina"], dig:["Digitalización","Digitalizazioa"], tec:["Tecnología","Teknologia"],
+  fopp:["Formación y Orientación Personal y Profesional","Prestakuntza eta Orientabide Pertsonal eta Profesionala"], eco:["Economía y Emprendimiento","Ekonomia eta Ekintzailetza"],
+  aesc:["Artes Escénicas","Arte Eszenikoak"], capl:["Ciencias Aplicadas a la Actividad Profesional","Jarduera Profesionalari Aplikatutako Zientziak"],
+  tmat:["Taller de Matemáticas","Matematika Tailerra"], fapl:["Filosofía Aplicada al Desarrollo Personal y Social","Garapen Pertsonal eta Sozialari Aplikatutako Filosofia"]
+};
+const B1={comunes:[["Educación Física","Gorputz Hezkuntza"],["Filosofía","Filosofia"],["Lengua Vasca y Literatura I","Euskara eta Literatura I"],["Lengua Castellana y Literatura I","Gaztelania eta Literatura I"],["Inglés I (Lengua extranjera)","Ingelesa I (Atzerriko hizkuntza)"]],
+  modalidad:[["Matemáticas I","Matematika I"],["Matemáticas Generales","Matematika Orokorrak"],["Matemáticas Aplicadas a las Ciencias Sociales I","Gizarte Zientziei Aplikatutako Matematika I"],["Física y Química","Fisika eta Kimika"],["Biología, Geología y Ciencias Ambientales","Biologia, Geologia eta Ingurumen Zientziak"],["Dibujo Técnico I","Marrazketa Teknikoa I"],["Tecnología e Ingeniería I","Teknologia eta Ingeniaritza I"],["Economía","Ekonomia"],["Economía, Emprendimiento y Actividad Empresarial","Ekonomia, Ekintzailetza eta Enpresa Jarduera"],["Historia del Mundo Contemporáneo","Mundu Garaikidearen Historia"],["Literatura Universal","Literatura Unibertsala"],["Latín I","Latina I"],["Griego I","Grekoa I"],["Dibujo Artístico I","Marrazketa Artistikoa I"],["Cultura Audiovisual","Ikus-entzunezko Kultura"],["Proyectos Artísticos","Proiektu Artistikoak"],["Volumen","Bolumena"],["Análisis Musical I","Musika Analisia I"],["Artes Escénicas I","Arte Eszenikoak I"],["Lenguaje y Práctica Musical","Musika Lengoaia eta Praktika"],["Coro y Técnica Vocal I","Koroa eta Ahots Teknika I"]],
+  optativas:[["Francés I (Segunda lengua extranjera)","Frantsesa I (Atzerriko bigarren hizkuntza)"]]};
+const B2={comunes:[["Historia de España","Espainiako Historia"],["Historia de la Filosofía","Filosofiaren Historia"],["Lengua Vasca y Literatura II","Euskara eta Literatura II"],["Lengua Castellana y Literatura II","Gaztelania eta Literatura II"],["Inglés II (Lengua extranjera)","Ingelesa II (Atzerriko hizkuntza)"]],
+  modalidad:[["Matemáticas II","Matematika II"],["Matemáticas Aplicadas a las Ciencias Sociales II","Gizarte Zientziei Aplikatutako Matematika II"],["Ciencias Generales","Zientzia Orokorrak"],["Física","Fisika"],["Química","Kimika"],["Biología","Biologia"],["Geología y Ciencias Ambientales","Geologia eta Ingurumen Zientziak"],["Dibujo Técnico II","Marrazketa Teknikoa II"],["Tecnología e Ingeniería II","Teknologia eta Ingeniaritza II"],["Empresa y Diseño de Modelos de Negocio","Enpresa eta Negozio Ereduen Diseinua"],["Geografía","Geografia"],["Historia del Arte","Artearen Historia"],["Latín II","Latina II"],["Griego II","Grekoa II"],["Movimientos Culturales y Artísticos","Mugimendu Kultural eta Artistikoak"],["Dibujo Artístico II","Marrazketa Artistikoa II"],["Diseño","Diseinua"],["Fundamentos Artísticos","Oinarri Artistikoak"],["Técnicas de Expresión Gráfico-plástica","Adierazpen Grafiko-plastikoko Teknikak"],["Análisis Musical II","Musika Analisia II"],["Artes Escénicas II","Arte Eszenikoak II"],["Historia de la Música y de la Danza","Musikaren eta Dantzaren Historia"],["Literatura Dramática","Literatura Dramatikoa"],["Coro y Técnica Vocal II","Koroa eta Ahots Teknika II"]],
+  optativas:[["Francés II (Segunda lengua extranjera)","Frantsesa II (Atzerriko bigarren hizkuntza)"],["Actividad Física, Ocio y Salud","Jarduera Fisikoa, Aisia eta Osasuna"]]};
+const P=k=>k.map(x=>({k:x,es:M[x][0],eu:M[x][1]}));
+const Q=a=>a.map(x=>({es:x[0],eu:x[1]}));
+const PRIM=["eus","cas","ing","mat","medio","art","mus","plas","ef"];
+const MATERIAS={
+  lh3:{comunes:P(PRIM)}, lh4:{comunes:P(PRIM)}, lh5:{comunes:P(PRIM)}, lh6:{comunes:P([...PRIM,"val"])},
+  dbh1:{comunes:P(["eus","cas","ing","mat","cn","gh","ef","val","mus","epv"]),optativas:P(["bien","itd","fr"])},
+  dbh2:{comunes:P(["eus","cas","ing","mat","cn","td","gh","ef","mus","epv"]),optativas:P(["bien","ipc","fr"])},
+  dbh3:{comunes:P(["eus","cas","ing","mat","bg","fq","td","gh","ef","mus","epv"]),optativas:P(["bien","ipc","ccl","ccie","expa","fr"])},
+  dbh4:{comunes:P(["eus","cas","ing","gh","matA","matB","ef"]),opcion:P(["bg","fq","lat","dig","expa","tec","fopp","mus","fr","eco"]),optativas:P(["aesc","ccie","capl","tmat","fapl"])},
+  bat1:{comunes:Q(B1.comunes),modalidad:Q(B1.modalidad),optativas:Q(B1.optativas)}, bat2:{comunes:Q(B2.comunes),modalidad:Q(B2.modalidad),optativas:Q(B2.optativas)}};
+const GRUPOS={comunes:["Comunes","Komunak"],opcion:["A elegir","Aukeran"],modalidad:["De modalidad","Modalitatekoak"],optativas:["Optativas","Hautazkoak"]};
+function matOptions(curso,sel){
+  const g=MATERIAS[curso]||{},li=S.ui==="eu"?1:0,ln=S.ui;let found=false,body="";
+  for(const k of ["comunes","opcion","modalidad","optativas"])if(g[k])body+=`<optgroup label="${esc(GRUPOS[k][li])}">${g[k].map(m=>{const on=!!sel&&(sel==="k:"+m.k||sel==="t:"+norm(m[ln]));if(on)found=true;
+    return `<option value="${esc(m.k?"k:"+m.k:m[ln])}" data-l="${esc(m[ln])}" ${on?"selected":""}>${esc(m[ln])}</option>`;}).join("")}</optgroup>`;
+  return `<option value="" disabled ${found?"":"selected"}>${esc(t("materiaPh"))}</option>`+body+`<option value="__otra">${esc(t("otraMat"))}</option>`;
+}
+/* Currículo vasco (Decreto 77/2023), a partir de los extractos por materia de Berritzegune.
+   comp: competencias específicas (resumidas). temas: propuesta de temas concretos derivados de los saberes básicos. [es, eu] */
+const C_LENG=["Valorar la realidad plurilingüe del País Vasco y evitar prejuicios lingüísticos","Comprender e interpretar textos orales y multimodales","Producir textos orales con fluidez e interactuar de forma cooperativa","Leer y comprender textos escritos de forma crítica","Escribir textos coherentes, cohesionados y correctos","Buscar, seleccionar y contrastar información","Construir un itinerario lector propio","Leer e interpretar obras literarias","Reflexionar sobre el funcionamiento de la lengua","Usar la lengua de forma ética y no discriminatoria"];
+const C_LE=["Comprender textos orales, escritos y multimodales sencillos","Producir textos breves y bien organizados","Interactuar con cooperación y normas de cortesía","Mediar: transmitir información sencilla","Reflexionar sobre las lenguas del repertorio propio","Valorar la diversidad lingüística y cultural"];
+const C_ART=["Explorar propuestas artísticas de distintas culturas y épocas","Investigar el patrimonio cultural y artístico","Expresarse creativamente con sonido, imagen, cuerpo y medios digitales","Crear producciones artísticas colaborativas"];
+const C_MUS=["Entender la función de la música y las artes escénicas","Conocer los rasgos y el contexto de las expresiones musicales","Relacionar emociones y expresión musical","Interpretar música con voz, instrumentos y movimiento","Crear propuestas musicales y escénicas"];
+const C_EPV=["Conocer y valorar expresiones plásticas, visuales y audiovisuales","Investigar y analizar producciones propias y ajenas","Experimentar con lenguajes visuales para expresar ideas y emociones","Participar en producciones artísticas colaborativas"];
+const C_EF=["Relacionar la actividad física con la salud","Mejorar en situaciones psicomotrices","Adaptarse a situaciones de oposición","Cooperar con empatía e inclusión","Interactuar en juegos de oposición-colaboración","Actuar con seguridad en entornos naturales y urbanos","Usar el cuerpo para expresarse y comunicarse"];
+const L=(s)=>s.split("\n").map(x=>x.trim()).filter(Boolean).map(x=>x.split(" | "));
+const T_LH={
+ eus:{comp:C_LENG,temas:L(`Mis lenguas y las lenguas del centro | Nire hizkuntzak eta ikastetxeko hizkuntzak
+ La narración: el cuento (inicio, nudo y desenlace) | Narrazioa: ipuina (hasiera, korapiloa eta amaiera)
+ Describir personas, animales y lugares | Pertsonak, animaliak eta lekuak deskribatzea
+ El diálogo y la conversación | Elkarrizketa
+ Textos instructivos: recetas y normas | Testu argibideemaileak: errezetak eta arauak
+ Izena, adjektiboa eta aditza | Izena, adjektiboa eta aditza
+ Familia de palabras y campo semántico | Hitz-familia eta eremu semantikoa
+ Sinónimos y antónimos | Sinonimoak eta antonimoak
+ Ortografía: h, tz/ts/tx, z/s/x | Ortografia: h, tz/ts/tx, z/s/x
+ Signos de puntuación | Puntuazio-markak
+ Tipos de oración según la intención | Esaldi motak asmoaren arabera
+ Mitología y leyendas vascas | Euskal mitologia eta kondairak
+ Poesía, bertsos y canciones | Olerkiak, bertsoak eta abestiak
+ Uso del diccionario | Hiztegiaren erabilera`)},
+ cas:{comp:C_LENG,temas:L(`Mis lenguas y las lenguas del centro | Nire hizkuntzak eta ikastetxeko hizkuntzak
+ La narración: el cuento (inicio, nudo y desenlace) | Narrazioa: ipuina (hasiera, korapiloa eta amaiera)
+ La descripción de personas, animales y lugares | Pertsonen, animalien eta lekuen deskribapena
+ El diálogo y la conversación | Elkarrizketa
+ Textos instructivos: recetas y normas | Testu argibideemaileak: errezetak eta arauak
+ El sustantivo, el adjetivo y el verbo | Izena, adjektiboa eta aditza
+ Familia de palabras y campo semántico | Hitz-familia eta eremu semantikoa
+ Sinónimos y antónimos | Sinonimoak eta antonimoak
+ Ortografía: b/v, g/j, h y mayúsculas | Ortografia: b/v, g/j, h eta letra larriak
+ Signos de puntuación | Puntuazio-markak
+ Tipos de oración según la intención | Esaldi motak asmoaren arabera
+ Cuentos, fábulas y leyendas | Ipuinak, alegiak eta kondairak
+ La poesía: verso y rima | Poesia: bertsoa eta errima
+ Uso del diccionario | Hiztegiaren erabilera`)},
+ ing:{comp:C_LE,temas:L(`Saludos y presentaciones (Hello, I'm…) | Agurrak eta aurkezpenak (Hello, I'm…)
+ Sentimientos y emociones (I'm happy, sad…) | Sentimenduak eta emozioak (I'm happy, sad…)
+ Describir personas (He's tall, she has got…) | Pertsonak deskribatzea (He's tall, she has got…)
+ Mi familia y mis amigos | Nire familia eta lagunak
+ Mi casa: habitaciones y muebles | Nire etxea: gelak eta altzariak
+ Lugares del pueblo y la ciudad | Herriko eta hiriko lekuak
+ There is / There are y preposiciones de lugar | There is / There are eta lekuaren preposizioak
+ Rutinas diarias y la hora | Eguneroko ohiturak eta ordua
+ Números y cantidades (How many…?) | Zenbakiak eta kopuruak (How many…?)
+ Habilidades: can / can't | Gaitasunak: can / can't
+ Preguntas: What, Where, Who, When | Galderak: What, Where, Who, When
+ Dar instrucciones (imperativos) | Argibideak ematea (aginterak)
+ Costumbres de países de habla inglesa | Ingelesez hitz egiten den herrialdeetako ohiturak`)},
+ mat:{comp:["Interpretar problemas cotidianos y representarlos","Resolver problemas con distintas estrategias y comprobar la solución","Explorar patrones y formular conjeturas","Usar el pensamiento computacional","Conectar las matemáticas con otras áreas y la vida diaria","Comunicar ideas matemáticas con el lenguaje adecuado","Gestionar las emociones y ver el error como aprendizaje","Trabajar en equipo con respeto"],temas:L(`Números hasta 9.999: leer, escribir y descomponer | 9.999ra arteko zenbakiak: irakurri, idatzi eta deskonposatu
+ Unidades, decenas, centenas y millares | Batekoak, hamarrekoak, ehunekoak eta milakoak
+ Comparar, ordenar y redondear números | Zenbakiak alderatu, ordenatu eta biribildu
+ Sumas y restas con llevadas | Eramanezko batuketak eta kenketak
+ Las tablas de multiplicar | Biderketa-taulak
+ La multiplicación | Biderketa
+ La división: repartir y agrupar | Zatiketa: banatu eta taldekatu
+ Cálculo mental y estimación | Buru-kalkulua eta estimazioa
+ Fracciones sencillas | Zatiki errazak
+ El dinero: euros, céntimos y cambio | Dirua: euroak, zentimoak eta itzulia
+ Longitud, masa y capacidad | Luzera, masa eta edukiera
+ El reloj, las horas y el calendario | Erlojua, orduak eta egutegia
+ Rectas paralelas, perpendiculares y ángulos | Zuzen paraleloak, perpendikularrak eta angeluak
+ Polígonos y cuerpos geométricos | Poligonoak eta gorputz geometrikoak
+ El perímetro | Perimetroa
+ Simetrías y traslaciones | Simetriak eta translazioak
+ Series y patrones | Segidak eta patroiak
+ Pictogramas, gráficos de barras y la moda | Piktogramak, barra-grafikoak eta moda
+ Seguro, posible e imposible | Ziurra, posiblea eta ezinezkoa
+ Resolución de problemas | Problemen ebazpena`)},
+ medio:{comp:["Buscar y seleccionar información fiable y comunicarla","Plantear preguntas científicas y usar el método científico","Resolver problemas con proyectos de diseño","Conocer el propio cuerpo y crear hábitos saludables","Analizar el entorno natural, social y cultural y proteger el patrimonio","Analizar el impacto humano y adoptar hábitos sostenibles","Interpretar cambios y continuidades en el tiempo","Valorar la diversidad y la igualdad de género","Participar en la sociedad con valores democráticos"],temas:L(`Los seres vivos y los reinos de la naturaleza | Izaki bizidunak eta naturaren erreinuak
+ Clasificación de los animales | Animalien sailkapena
+ Las plantas: partes, nutrición y reproducción | Landareak: atalak, elikadura eta ugalketa
+ Los ecosistemas de Euskadi | Euskadiko ekosistemak
+ La biodiversidad y sus amenazas | Biodibertsitatea eta haren mehatxuak
+ El cuerpo y los hábitos saludables | Gorputza eta ohitura osasungarriak
+ Calor, temperatura y cambios de estado | Beroa, tenperatura eta egoera-aldaketak
+ Las fuerzas y las máquinas simples | Indarrak eta makina sinpleak
+ La Tierra y el sistema solar | Lurra eta eguzki-sistema
+ Mapas, planos, escalas y orientación | Mapak, planoak, eskalak eta orientazioa
+ El relieve, los ríos y el paisaje | Erliebea, ibaiak eta paisaia
+ El tiempo atmosférico y el clima | Eguraldia eta klima
+ Las rocas | Arrokak
+ La población y las actividades económicas | Biztanleria eta jarduera ekonomikoak
+ Municipio, Euskadi, España y Europa | Udalerria, Euskadi, Espainia eta Europa
+ Instituciones, normas de convivencia e impuestos | Erakundeak, bizikidetza-arauak eta zergak
+ El tiempo histórico y la línea del tiempo | Denbora historikoa eta denbora-lerroa
+ La Prehistoria en Euskal Herria | Historiaurrea Euskal Herrian
+ La Edad Antigua y los romanos | Antzinaroa eta erromatarrak
+ Patrimonio natural y cultural de Euskadi | Euskadiko natura- eta kultura-ondarea
+ Cambio climático y consumo responsable | Klima-aldaketa eta kontsumo arduratsua
+ Uso seguro de Internet | Interneten erabilera segurua
+ Educación vial | Bide-hezkuntza`)},
+ mus:{comp:C_ART,temas:L(`Sonido, ruido y silencio | Soinua, zarata eta isiltasuna
+ Cualidades del sonido: altura, duración, intensidad y timbre | Soinuaren ezaugarriak: altuera, iraupena, intentsitatea eta tinbrea
+ Notas y figuras musicales | Musika-notak eta irudiak
+ Pulso, ritmo y tempo | Taupada, erritmoa eta tempoa
+ Familias de instrumentos | Musika-tresnen familiak
+ Instrumentos tradicionales vascos | Euskal musika-tresna tradizionalak
+ La voz y las agrupaciones musicales | Ahotsa eta musika-taldeak
+ Canciones populares de Euskal Herria y del mundo | Euskal Herriko eta munduko herri-abestiak
+ Cómo escuchar un concierto | Kontzertu bat nola entzun`)},
+ plas:{comp:C_ART,temas:L(`Punto, línea y plano | Puntua, lerroa eta planoa
+ El color: primarios, secundarios, fríos y cálidos | Kolorea: lehen mailakoak, bigarren mailakoak, hotzak eta beroak
+ Las texturas | Testurak
+ Técnicas de dibujo y pintura | Marrazketa- eta pintura-teknikak
+ Modelado y volumen | Modelatzea eta bolumena
+ Leer una imagen: cómic, cartel y fotografía | Irudi bat irakurtzea: komikia, kartela eta argazkia
+ Obras de arte y museos | Artelanak eta museoak
+ El proceso creativo | Sormen-prozesua`)},
+ ef:{comp:C_EF,temas:L(`Esquema corporal y lateralidad | Gorputz-eskema eta lateralitatea
+ Habilidades motrices básicas | Oinarrizko trebetasun motorrak
+ Capacidades físicas básicas | Oinarrizko gaitasun fisikoak
+ Juegos de oposición y normas de seguridad | Aurkakotasun-jokoak eta segurtasun-arauak
+ Juegos cooperativos | Lankidetza-jokoak
+ Juegos tradicionales vascos | Euskal joko tradizionalak
+ Juegos de equipo: ataque y defensa | Talde-jokoak: erasoa eta defentsa
+ Orientación en el medio natural | Orientazioa naturan
+ Expresión corporal, ritmo y danzas | Gorputz-adierazpena, erritmoa eta dantzak
+ Salud: higiene, alimentación y prevención | Osasuna: higienea, elikadura eta prebentzioa
+ Educación vial y movilidad sostenible | Bide-hezkuntza eta mugikortasun jasangarria`)}
+};
+T_LH.art={comp:C_ART,temas:[...T_LH.mus.temas,...T_LH.plas.temas]};
+const T_DBH1={
+ eus:{comp:C_LENG,temas:L(`Los dialectos del euskera y el euskera batua | Euskalkiak eta euskara batua
+ Historia del euskera y primeros textos | Euskararen historia eta lehen testuak
+ Situación del euskera hoy (Korrika, EKE…) | Euskararen egoera gaur (Korrika, EKE…)
+ Tipos de texto: narración, descripción, diálogo y exposición | Testu motak: narrazioa, deskribapena, elkarrizketa eta azalpena
+ Géneros: correo electrónico, decálogo, folleto y exposición oral | Generoak: posta elektronikoa, dekalogoa, liburuxka eta ahozko aurkezpena
+ Coherencia, cohesión y conectores | Koherentzia, kohesioa eta lokailuak
+ Concordancia verbal y declinación | Aditz-komunztadura eta deklinabidea
+ Los tiempos pasados en la narración | Iraganeko denborak narrazioan
+ Categorías gramaticales y funciones | Kategoria gramatikalak eta funtzioak
+ Formación de palabras: prefijos y sufijos | Hitz-eraketa: aurrizkiak eta atzizkiak
+ Refranes y dichos | Esaera zaharrak eta errefrauak
+ Mitología y leyendas vascas | Euskal mitologia eta kondairak
+ Bertsolarismo, kopla zaharrak y poesía | Bertsolaritza, kopla zaharrak eta olerkigintza
+ La estructura de la narración | Narrazioaren egitura
+ El teatro | Antzerkia
+ Resúmenes, esquemas y mapas conceptuales | Laburpenak, eskemak eta kontzeptu-mapak`)},
+ cas:{comp:C_LENG,temas:L(`Las lenguas de España y las variedades del español | Espainiako hizkuntzak eta gaztelaniaren aldaerak
+ Prejuicios lingüísticos y lenguaje no sexista | Hizkuntza-aurreiritziak eta hizkera ez-sexista
+ La comunicación y sus elementos | Komunikazioa eta haren elementuak
+ Tipos de texto: narración, descripción, diálogo y exposición | Testu motak: narrazioa, deskribapena, elkarrizketa eta azalpena
+ Géneros: correo electrónico, decálogo, folleto y exposición oral | Generoak: posta elektronikoa, dekalogoa, liburuxka eta ahozko aurkezpena
+ Coherencia, cohesión y conectores | Koherentzia, kohesioa eta lokailuak
+ Las categorías gramaticales | Kategoria gramatikalak
+ El verbo: tiempos pasados y concordancia | Aditza: iraganeko denborak eta komunztadura
+ La oración simple: sujeto y predicado | Perpaus bakuna: subjektua eta predikatua
+ Formación de palabras: derivación y composición | Hitz-eraketa: eratorpena eta elkarketa
+ Sinonimia, antonimia, denotación y connotación | Sinonimia, antonimia, denotazioa eta konnotazioa
+ Ortografía y puntuación | Ortografia eta puntuazioa
+ La narración literaria: narrador, personajes y estructura | Narrazio literarioa: narratzailea, pertsonaiak eta egitura
+ Mitos, leyendas y cuentos populares | Mitoak, kondairak eta herri-ipuinak
+ La poesía: verso, rima y figuras literarias | Poesia: bertsoa, errima eta figura literarioak
+ El teatro | Antzerkia
+ Resumen, esquema y mapa conceptual | Laburpena, eskema eta kontzeptu-mapa`)},
+ ing:{comp:C_LE,temas:L(`Presentarse y datos personales (to be, have got) | Aurkezpena eta datu pertsonalak (to be, have got)
+ Describir personas, objetos y lugares | Pertsonak, objektuak eta lekuak deskribatzea
+ La familia y las relaciones personales | Familia eta harreman pertsonalak
+ La casa y el entorno (there is/are, preposiciones) | Etxea eta ingurunea (there is/are, preposizioak)
+ Rutinas y tiempo libre (present simple) | Ohiturak eta aisialdia (present simple)
+ Lo que está pasando ahora (present continuous) | Orain gertatzen ari dena (present continuous)
+ Gustos y preferencias (like, love, hate + -ing) | Gustuak eta lehentasunak (like, love, hate + -ing)
+ Habilidades, obligación y prohibición (can, must) | Gaitasunak, betebeharra eta debekua (can, must)
+ Cantidades: countable/uncountable, some/any | Kopuruak: countable/uncountable, some/any
+ Comparar: comparativos y superlativos | Alderatzea: konparatiboak eta superlatiboak
+ Contar el pasado (past simple: was/were, verbos regulares e irregulares) | Iragana kontatzea (past simple: was/were, aditz erregular eta irregularrak)
+ Planes y futuro (be going to, will) | Asmoak eta etorkizuna (be going to, will)
+ Comida, salud y deporte | Janaria, osasuna eta kirola
+ El tiempo y la naturaleza | Eguraldia eta natura
+ Tecnología e Internet | Teknologia eta Internet
+ Pronunciación y entonación | Ahoskera eta intonazioa
+ Cultura de países de habla inglesa | Ingelesez hitz egiten den herrialdeetako kultura`)},
+ mat:{comp:["Interpretar, modelizar y resolver problemas","Comprobar la validez de las soluciones","Formular conjeturas y nuevos problemas","Usar el pensamiento computacional","Conectar ideas matemáticas","Aplicar las matemáticas a otras materias y situaciones reales","Representar conceptos y resultados","Comunicar el razonamiento con terminología precisa","Gestionar las emociones y perseverar","Colaborar en equipo con respeto"],temas:L(`Números naturales y jerarquía de operaciones | Zenbaki arruntak eta eragiketen hierarkia
+ Múltiplos, divisores y números primos | Multiploak, zatitzaileak eta zenbaki lehenak
+ Descomposición factorial, m.c.d. y m.c.m. | Faktorizazioa, z.k.h. eta m.k.t.
+ Números enteros: representación y operaciones | Zenbaki osoak: irudikapena eta eragiketak
+ Fracciones: equivalencia, comparación y operaciones | Zatikiak: baliokidetasuna, alderaketa eta eragiketak
+ Números decimales | Zenbaki hamartarrak
+ Fracciones, decimales y porcentajes | Zatikiak, hamartarrak eta ehunekoak
+ Potencias y raíces cuadradas | Berreturak eta erro karratuak
+ Proporcionalidad directa e inversa | Proportzionaltasun zuzena eta alderantzizkoa
+ Porcentajes, aumentos y descuentos | Ehunekoak, gehikuntzak eta deskontuak
+ Educación financiera: el presupuesto familiar | Finantza-hezkuntza: familiako aurrekontua
+ Unidades de medida y conversiones | Neurri-unitateak eta bihurketak
+ Perímetros y áreas | Perimetroak eta azalerak
+ Figuras planas y cuerpos geométricos | Irudi lauak eta gorputz geometrikoak
+ Coordenadas cartesianas | Koordenatu kartesiarrak
+ Traslaciones, giros y simetrías | Translazioak, biraketak eta simetriak
+ Lenguaje algebraico y expresiones | Hizkera aljebraikoa eta adierazpenak
+ Ecuaciones de primer grado | Lehen mailako ekuazioak
+ Tablas de frecuencias y gráficos | Maiztasun-taulak eta grafikoak
+ Media, mediana, moda y rango | Batezbestekoa, mediana, moda eta heina
+ Probabilidad y regla de Laplace | Probabilitatea eta Laplaceren erregela
+ Técnicas de recuento: diagramas de árbol | Zenbaketa-teknikak: zuhaitz-diagramak`)},
+ cn:{comp:["Explicar fenómenos naturales con razonamiento científico","Buscar y seleccionar información científica","Interpretar y comunicar datos científicos","Investigar con el método científico","Aplicar las convenciones científicas y trabajar con seguridad en el laboratorio","Adoptar hábitos sostenibles y saludables basados en evidencias","Entender la ciencia como una construcción colectiva"],temas:L(`El método científico | Metodo zientifikoa
+ El laboratorio: normas de seguridad e instrumentos | Laborategia: segurtasun-arauak eta tresnak
+ Magnitudes y unidades de medida | Magnitudeak eta neurri-unitateak
+ La materia y sus propiedades | Materia eta haren propietateak
+ Estados de la materia y teoría cinético-molecular | Materiaren egoerak eta teoria zinetiko-molekularra
+ Cambios de estado | Egoera-aldaketak
+ Mezclas y disoluciones | Nahasteak eta disoluzioak
+ Cambios físicos y químicos | Aldaketa fisikoak eta kimikoak
+ La célula: procariota, animal y vegetal | Zelula: prokariotoa, animalia-zelula eta landare-zelula
+ El microscopio | Mikroskopioa
+ Clasificación de los seres vivos | Izaki bizidunen sailkapena
+ Especies del entorno | Inguruko espezieak
+ Enfermedades infecciosas, antibióticos y vacunas | Gaixotasun infekziosoak, antibiotikoak eta txertoak
+ Hábitos saludables | Ohitura osasungarriak
+ Minerales y rocas; el ciclo de las rocas | Mineralak eta arrokak; arroken zikloa
+ El movimiento y la velocidad | Mugimendua eta abiadura
+ Las fuerzas y las leyes de Newton | Indarrak eta Newtonen legeak
+ La energía: formas y transformaciones | Energia: formak eta eraldaketak
+ Calor y temperatura | Beroa eta tenperatura
+ Fuentes de energía renovables y no renovables | Energia-iturri berriztagarriak eta ez-berriztagarriak
+ Los ecosistemas y sus relaciones | Ekosistemak eta haien harremanak
+ La atmósfera y la hidrosfera | Atmosfera eta hidrosfera
+ La biodiversidad y su conservación | Biodibertsitatea eta haren kontserbazioa
+ Cambio climático y sostenibilidad | Klima-aldaketa eta jasangarritasuna`)},
+ gh:{comp:["Investigar problemas geográficos, históricos y sociales","Analizar el paisaje y su uso sostenible","Explicar los sistemas políticos","Comprender los retos de las sociedades","Describir los comportamientos demográficos","Explicar los sistemas económicos","Conocer el origen de las identidades colectivas y el patrimonio","Comprender la realidad multicultural","Valorar las aportaciones de las civilizaciones"],temas:L(`Mapas, escalas y orientación | Mapak, eskalak eta orientazioa
+ Los movimientos de la Tierra | Lurraren mugimenduak
+ El relieve terrestre | Lurreko erliebea
+ La hidrosfera: ríos, mares y océanos | Hidrosfera: ibaiak, itsasoak eta ozeanoak
+ El tiempo atmosférico y el clima | Eguraldia eta klima
+ Los paisajes naturales del mundo | Munduko paisaia naturalak
+ El medio físico del País Vasco | Euskal Herriko ingurune fisikoa
+ Riesgos naturales y cambio climático | Arrisku naturalak eta klima-aldaketa
+ La población y las migraciones | Biztanleria eta migrazioak
+ La ciudad y el mundo rural | Hiria eta landa-mundua
+ Los sectores económicos | Sektore ekonomikoak
+ Naciones Unidas y los ODS | Nazio Batuak eta GJH
+ Paleolítico, Neolítico y Edad de los Metales | Paleolitoa, Neolitoa eta Metal Aroa
+ La Prehistoria en el País Vasco | Historiaurrea Euskal Herrian
+ Mesopotamia y Egipto | Mesopotamia eta Egipto
+ La antigua Grecia | Antzinako Grezia
+ Roma | Erroma
+ La romanización de la Península y del País Vasco | Penintsularen eta Euskal Herriaren erromanizazioa
+ Religiones de la Antigüedad | Antzinaroko erlijioak
+ El arte antiguo | Antzinaroko artea`)},
+ ef:{comp:C_EF,temas:L(`Capacidades físicas básicas y salud | Oinarrizko gaitasun fisikoak eta osasuna
+ Actividad física recomendada y tipos de esfuerzo | Gomendatutako jarduera fisikoa eta ahalegin motak
+ Higiene postural y relajación | Jarrera-higienea eta erlaxazioa
+ Primeros auxilios: PAS y 112 | Lehen sorospenak: PAS eta 112
+ Juegos y deportes de oposición | Aurkakotasun-jokoak eta -kirolak
+ Deportes de equipo: ataque y defensa | Talde-kirolak: erasoa eta defentsa
+ Juegos cooperativos y acrosport | Lankidetza-jokoak eta akrosporta
+ Juegos y deportes tradicionales vascos | Euskal joko eta kirol tradizionalak
+ Orientación: puntos cardinales, mapas y brújula | Orientazioa: puntu kardinalak, mapak eta iparrorratza
+ Actividades en la naturaleza y seguridad | Natura-jarduerak eta segurtasuna
+ Expresión corporal y danza | Gorputz-adierazpena eta dantza
+ Igualdad y respeto en el deporte | Berdintasuna eta errespetua kirolean`)},
+ val:{comp:["Investigar la propia identidad y formar juicios morales autónomos","Convivir con respeto y valores democráticos","Comprender la interdependencia y adoptar estilos de vida sostenibles","Gestionar las emociones con empatía y asertividad"],temas:L(`Identidad personal y autoestima | Identitate pertsonala eta autoestimua
+ Las emociones y su gestión | Emozioak eta haien kudeaketa
+ Autonomía y heteronomía moral | Autonomia eta heteronomia morala
+ Ética y moral | Etika eta morala
+ Normas morales, jurídicas y sociales | Arau moralak, juridikoak eta sozialak
+ Libertad y responsabilidad | Askatasuna eta erantzukizuna
+ Igualdad de género y corresponsabilidad | Genero-berdintasuna eta erantzunkidetasuna
+ Diversidad cultural e inclusión | Kultura-aniztasuna eta inklusioa
+ Justicia, desigualdad e impuestos | Justizia, desberdintasuna eta zergak
+ Derechos humanos y deberes | Giza eskubideak eta betebeharrak
+ Diálogo y resolución de conflictos | Elkarrizketa eta gatazken konponbidea
+ Participación ciudadana y voluntariado | Herritarren parte-hartzea eta boluntariotza
+ Huella ecológica y emergencia climática | Aztarna ekologikoa eta larrialdi klimatikoa
+ Consumo responsable y sostenibilidad | Kontsumo arduratsua eta jasangarritasuna`)},
+ mus:{comp:C_MUS,temas:L(`Sonido, ruido, silencio y contaminación acústica | Soinua, zarata, isiltasuna eta kutsadura akustikoa
+ Cualidades del sonido | Soinuaren ezaugarriak
+ Lenguaje musical: notas, figuras y compás | Musika-lengoaia: notak, irudiak eta konpasa
+ Escalas y acordes básicos | Eskalak eta oinarrizko akordeak
+ Ritmo, melodía, armonía, textura y forma | Erritmoa, melodia, harmonia, testura eta forma
+ La voz humana | Giza ahotsa
+ Clasificación de los instrumentos | Musika-tresnen sailkapena
+ Agrupaciones musicales | Musika-taldeak
+ Música y danza de Euskal Herria | Euskal Herriko musika eta dantza
+ Periodos de la historia de la música | Musikaren historiako aldiak
+ Música popular, urbana y actual | Herri-musika, hiri-musika eta gaur egungo musika
+ La música en el cine y los medios | Musika zineman eta hedabideetan
+ Derechos de autor y licencias | Egile-eskubideak eta lizentziak`)},
+ epv:{comp:C_EPV,temas:L(`Punto, línea y plano | Puntua, lerroa eta planoa
+ Forma, color y textura | Forma, kolorea eta testura
+ La composición | Konposizioa
+ Imagen fija e imagen en movimiento | Irudi finkoa eta irudi mugikorra
+ Técnicas secas y húmedas | Teknika lehorrak eta hezeak
+ Volumen y técnicas tridimensionales | Bolumena eta hiru dimentsioko teknikak
+ Trazados geométricos básicos | Oinarrizko trazadura geometrikoak
+ Patrimonio y géneros artísticos | Ondarea eta genero artistikoak
+ El proceso creativo | Sormen-prozesua
+ Producción audiovisual sencilla | Ikus-entzunezko ekoizpen erraza`)},
+ bien:{comp:["Ampliar el repertorio motor y reconocer una vida activa y saludable","Gestionar las emociones en la práctica motriz","Mantener buenas relaciones y un clima positivo en el grupo"],temas:L(`Juegos y deportes tradicionales vascos | Euskal joko eta kirol tradizionalak
+ Deportes alternativos y adaptados | Kirol alternatiboak eta egokituak
+ Expresión corporal y danzas | Gorputz-adierazpena eta dantzak
+ Cualidades físicas y salud | Gaitasun fisikoak eta osasuna
+ Sedentarismo, nutrición e hidratación | Sedentarismoa, nutrizioa eta hidratazioa
+ Lesiones comunes y cómo actuar | Ohiko lesioak eta nola jokatu
+ Emociones primarias y secundarias | Lehen eta bigarren mailako emozioak
+ Regulación emocional, respiración y relajación | Emozioen erregulazioa, arnasketa eta erlaxazioa
+ Empatía y gestión de conflictos | Enpatia eta gatazken kudeaketa`)},
+ fr:{comp:C_LE,temas:L(`Saludar y presentarse | Agurtzea eta aurkeztea
+ Datos personales | Datu pertsonalak
+ Describir personas, objetos y lugares | Pertsonak, objektuak eta lekuak deskribatzea
+ La familia y las relaciones | Familia eta harremanak
+ La casa y el hogar | Etxea
+ Vida diaria y tiempo libre | Eguneroko bizitza eta aisialdia
+ Gustos y emociones | Gustuak eta emozioak
+ La hora, la fecha y el lugar | Ordua, data eta lekua
+ Salud y actividad física | Osasuna eta jarduera fisikoa
+ Contar hechos pasados | Iraganeko gertaerak kontatzea
+ Pronunciación y ortografía básica | Oinarrizko ahoskera eta ortografia
+ Cultura de los países francófonos | Herrialde frankofonoen kultura`)}
+};
+const CURR={lh3:T_LH,lh4:T_LH,dbh1:T_DBH1};
+const currOf=tm=>tm&&CURR[tm.curso]&&tm.matKey?CURR[tm.curso][tm.matKey]:null;
+/* Idioma del contenido según la asignatura: las de lengua van solo en su lengua */
+function soloLang(tm){const k=tm.matKey||"",m=norm(tm.materia);
+  if(k==="eus"||/^(lengua vasca|euskara)/.test(m))return "eu";
+  if(k==="cas"||/^(lengua castellana|gaztelania)/.test(m))return "es";
+  return null;}
+function targetLang(tm){const k=tm.matKey||"",m=norm(tm.materia);
+  if(k==="ing"||/^(ingles|ingelesa)/.test(m))return "inglés";
+  if(k==="fr"||/^(frances|frantsesa)/.test(m))return "francés";
+  return null;}
+function temaOptions(curso,key,sel){
+  const c=CURR[curso]&&CURR[curso][key];if(!c)return "";const li=S.ui==="eu"?1:0;
+  return `<option value="">${esc(t("temaLibre"))}</option>`+c.temas.map((x,i)=>`<option value="${i}" ${x[li]===sel?"selected":""}>${esc(x[li])}</option>`).join("");
+}
+const TIPOS=["test","vf","huecos","corta","desarrollo"];
+
+/* ---------- Estado ---------- */
+const S={perfiles:[],perfil:null,orden:"recientes",filtro:"todos",q:"",ui:(navigator.language||"es").toLowerCase().startsWith("eu")?"eu":"es", temas:[], imgs:{}, view:{name:"home"}, editNotes:false, confirmDel:false, err:"", storageOk:true};
+const t=(k,v)=>{let s=(T[S.ui][k]!==undefined?T[S.ui][k]:T.es[k]);if(s===undefined)return k;if(v&&typeof s==="string")for(const x in v)s=s.split("{"+x+"}").join(v[x]);return s;};
+const esc=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+const cur=()=>S.temas.find(x=>x.id===S.view.id);
+const cursoLbl=(id,l)=>{const c=CURSOS.find(c=>c.id===id);return c?c[l||S.ui]:id;};
+const fmtNota=n=>n==null?"—":(Math.round(n*10)/10).toFixed(1).replace(".",",");
+const fecha=ts=>{try{return new Date(ts).toLocaleString(S.ui==="eu"?"eu-ES":"es-ES",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"});}catch(e){return new Date(ts).toLocaleString();}};
+
+/* ---------- Almacenamiento (IndexedDB) ---------- */
+const DB={db:null,
+  open(){return new Promise(res=>{let done=false;const fin=v=>{if(!done){done=true;res(v);}};setTimeout(()=>fin(false),2500);
+    try{const r=indexedDB.open("ikasi-apuntes",1);r.onupgradeneeded=()=>r.result.createObjectStore("kv");r.onsuccess=()=>{this.db=r.result;fin(true);};r.onerror=()=>fin(false);r.onblocked=()=>fin(false);}catch(e){fin(false);}});},
+  get(k){return new Promise(res=>{if(!this.db)return res(undefined);try{const q=this.db.transaction("kv").objectStore("kv").get(k);q.onsuccess=()=>res(q.result);q.onerror=()=>res(undefined);}catch(e){res(undefined);}});},
+  set(k,v){if(!this.db)return;try{this.db.transaction("kv","readwrite").objectStore("kv").put(v,k);}catch(e){}},
+  del(k){if(!this.db)return;try{this.db.transaction("kv","readwrite").objectStore("kv").delete(k);}catch(e){}}
+};
+let saveTimer=null;
+function save(){clearTimeout(saveTimer);saveTimer=setTimeout(()=>DB.set("state",{ui:S.ui,temas:S.temas,lastBackup:S.lastBackup||0,prefInno:S.prefInno,perfiles:S.perfiles,perfil:S.perfil,orden:S.orden}),300);}
+function saveImgs(id){DB.set("img:"+id,S.imgs[id]||[]);}
+async function loadImgs(id){if(S.imgs[id])return;const v=await DB.get("img:"+id);S.imgs[id]=Array.isArray(v)?v:[];}
+
+/* ---------- Markdown mínimo ---------- */
+/* Trozos de texto con formato: b negrita, i cursiva, del tachado, mark añadido, fix corrección, math fórmula */
+function runs(s,f){
+  f=f||{};const out=[];const re=/\$\$(.+?)\$\$|\$(?![\s$])([^$\n]+?)\$|\\\((.+?)\\\)|~~(.+?)~~|==(.+?)==|\*\*(.+?)\*\*|\*([^*\s][^*]*?)\*/g;let last=0,m;
+  while((m=re.exec(s))){
+    if(m.index>last)out.push(Object.assign({t:s.slice(last,m.index)},f));
+    if(m[1]!==undefined||m[2]!==undefined||m[3]!==undefined)out.push(Object.assign({},f,{t:m[1]||m[2]||m[3],math:true}));
+    else if(m[4]!==undefined)out.push(...runs(m[4],Object.assign({},f,{del:true})));
+    else if(m[5]!==undefined)out.push(...runs(m[5],Object.assign({},f,{mark:true})));
+    else if(m[6]!==undefined)out.push(...runs(m[6],Object.assign({},f,{b:true})));
+    else out.push(...runs(m[7],Object.assign({},f,{i:true})));
+    last=re.lastIndex;
+  }
+  if(last<s.length)out.push(Object.assign({t:s.slice(last)},f));
+  return out;
+}
+function fixRuns(rs){let last=null;for(const r of rs){if(!r.t.trim())continue;if(r.b&&!r.del&&last&&(last.del||last.fix))r.fix=true;last=r;}return rs;}
+const inlineRuns=s=>fixRuns(runs(String(s==null?"":s)));
+/* Fórmulas: KaTeX a MathML (no necesita hoja de estilos ni fuentes) */
+const KATEX="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js";
+let needKatex=false;
+function mathHtml(tex,disp){
+  if(window.katex){try{return window.katex.renderToString(tex,{output:"mathml",throwOnError:false,displayMode:!!disp,strict:"ignore"});}catch(e){}}
+  else needKatex=true;
+  return `<code class="tex${disp?" disp":""}">${esc(tex)}</code>`;
+}
+function runsHtml(rs){return rs.map(r=>{if(r.math)return mathHtml(r.t,false);let h=esc(r.t);if(r.i)h=`<em>${h}</em>`;if(r.b)h=`<strong${r.fix?' class="k-fix"':""}>${h}</strong>`;if(r.del)h=`<del>${h}</del>`;if(r.mark)h=`<mark>${h}</mark>`;return h;}).join("");}
+const rich=s=>runsHtml(inlineRuns(s));
+/* Texto plano aproximado de una fórmula, para PDF y Word */
+const GREEK={alpha:"α",beta:"β",gamma:"γ",delta:"δ",Delta:"Δ",epsilon:"ε",varepsilon:"ε",theta:"θ",lambda:"λ",mu:"μ",nu:"ν",pi:"π",rho:"ρ",sigma:"σ",Sigma:"Σ",tau:"τ",phi:"φ",varphi:"φ",omega:"ω",Omega:"Ω",eta:"η",Gamma:"Γ",Phi:"Φ",Lambda:"Λ",Pi:"Π",Theta:"Θ",chi:"χ",psi:"ψ",kappa:"κ",xi:"ξ",zeta:"ζ"};
+const SYM={cdot:"·",times:"×",div:"÷",pm:"±",mp:"∓",leq:"≤",le:"≤",geq:"≥",ge:"≥",neq:"≠",ne:"≠",approx:"≈",sim:"∼",equiv:"≡",propto:"∝",infty:"∞",to:"→",rightarrow:"→",Rightarrow:"⇒",leftarrow:"←",leftrightarrow:"↔",Leftrightarrow:"⇔",circ:"°",degree:"°",partial:"∂",nabla:"∇",sum:"Σ",int:"∫",prod:"∏",ldots:"…",cdots:"⋯",dots:"…",quad:" ",qquad:"  ",forall:"∀",exists:"∃",in:"∈",cup:"∪",cap:"∩",subset:"⊂",angle:"∠",perp:"⊥",parallel:"∥",lt:"<",gt:">",ell:"ℓ",hbar:"ħ",cdotp:"·",bullet:"•",checkmark:"✓"};
+const SUP={"0":"⁰","1":"¹","2":"²","3":"³","4":"⁴","5":"⁵","6":"⁶","7":"⁷","8":"⁸","9":"⁹","+":"⁺","-":"⁻","−":"⁻","=":"⁼","(":"⁽",")":"⁾","n":"ⁿ","i":"ⁱ"};
+const SUB={"0":"₀","1":"₁","2":"₂","3":"₃","4":"₄","5":"₅","6":"₆","7":"₇","8":"₈","9":"₉","+":"₊","-":"₋","=":"₌","(":"₍",")":"₎"};
+function texText(tex){
+  let s=String(tex);
+  const grp="\\{((?:[^{}]|\\{[^{}]*\\})*)\\}";
+  for(let k=0;k<4;k++){
+    s=s.replace(new RegExp("\\\\[dt]?frac\\s*"+grp+"\\s*"+grp,"g"),(m,a,b)=>`(${a})/(${b})`)
+     .replace(new RegExp("\\\\sqrt\\s*\\[([^\\]]*)\\]\\s*"+grp,"g"),(m,n,a)=>`${n}√(${a})`)
+     .replace(new RegExp("\\\\sqrt\\s*"+grp,"g"),(m,a)=>`√(${a})`)
+     .replace(new RegExp("\\\\(?:vec|overrightarrow)\\s*"+grp,"g"),(m,a)=>a+"\u20D7")
+     .replace(new RegExp("\\\\(?:text|mathrm|mathbf|mathit|operatorname|textbf|textit|mbox)\\s*"+grp,"g"),"$1")
+     .replace(new RegExp("\\\\(?:hat|bar|overline|dot)\\s*"+grp,"g"),"$1");
+  }
+  s=s.replace(/\\left|\\right|\\displaystyle|\\limits/g,"").replace(/\\[,;:!]/g," ").replace(/\\\\/g," ")
+   .replace(/\\([A-Za-z]+)/g,(m,w)=>GREEK[w]||SYM[w]||w)
+   .replace(new RegExp("\\^"+grp,"g"),(m,a)=>[...a].every(c=>SUP[c])?[...a].map(c=>SUP[c]).join(""):"^("+a+")")
+   .replace(/\^(.)/g,(m,c)=>SUP[c]||"^"+c)
+   .replace(new RegExp("_"+grp,"g"),(m,a)=>[...a].every(c=>SUB[c])?[...a].map(c=>SUB[c]).join(""):"_"+a)
+   .replace(/_(.)/g,(m,c)=>SUB[c]||"_"+c)
+   .replace(/[{}]/g,"").replace(/\s+/g," ").trim();
+  return s;
+}
+/* Bloques: h, ul/ol, p, q (cita), callout, table, math, svg, code, hr */
+function parseTable(lines){
+  const cells=l=>l.trim().replace(/^\|/,"").replace(/\|$/,"").split("|").map(c=>c.trim());
+  const rows=lines.map(cells);let head=null;
+  if(rows.length>1&&rows[1].every(c=>/^:?-{2,}:?$/.test(c))){head=rows[0];rows.splice(0,2);}
+  return {k:"table",head,rows};
+}
+function blocks(src){
+  const out=[];let list=null,para=[];
+  const fp=()=>{if(para.length){out.push({k:"p",t:para.join(" "),lines:para.slice()});para=[];}};
+  const fl=()=>{list=null;};
+  const L=String(src||"").replace(/\r/g,"").split("\n");
+  for(let i=0;i<L.length;i++){
+    const l=L[i].replace(/\s+$/,"");let m;
+    if(!l.trim()){fp();fl();continue;}
+    if((m=l.match(/^\s*```\s*([\w-]*)\s*$/))){fp();fl();const lang=m[1].toLowerCase(),buf=[];i++;
+      while(i<L.length&&!/^\s*```\s*$/.test(L[i])){buf.push(L[i]);i++;}
+      const code=buf.join("\n");
+      if(lang==="svg"||(/^\s*<svg[\s>]/i.test(code)&&(lang===""||lang==="xml"||lang==="html")))out.push({k:"svg",code});
+      else if(lang==="latex"||lang==="math"||lang==="tex")out.push({k:"math",t:code.trim()});
+      else out.push({k:"code",t:code});
+      continue;}
+    if(/^\s*<svg[\s>]/i.test(l)){fp();fl();const buf=[l];while(!/<\/svg>\s*$/i.test(buf[buf.length-1])&&i+1<L.length){i++;buf.push(L[i]);}out.push({k:"svg",code:buf.join("\n")});continue;}
+    if(/^\s*(\$\$|\\\[)/.test(l)){fp();fl();const open=l.trim().startsWith("$$")?"$$":"\\[",close=open==="$$"?"$$":"\\]";
+      let body=l.trim().slice(2);
+      if(body.trim().endsWith(close)){out.push({k:"math",t:body.trim().slice(0,-2).trim()});continue;}
+      const buf=[body];i++;while(i<L.length&&!L[i].trim().endsWith(close)){buf.push(L[i]);i++;}
+      if(i<L.length)buf.push(L[i].trim().slice(0,-2));
+      out.push({k:"math",t:buf.join("\n").trim()});continue;}
+    if(/^\s*\|/.test(l)){fp();fl();const buf=[l];while(i+1<L.length&&/^\s*\|/.test(L[i+1])){i++;buf.push(L[i]);}out.push(parseTable(buf));continue;}
+    if(/^\s*>/.test(l)){fp();fl();const buf=[l.replace(/^\s*>\s?/,"")];while(i+1<L.length&&/^\s*>/.test(L[i+1])){i++;buf.push(L[i].replace(/^\s*>\s?/,""));}
+      const c=buf[0].match(/^\[!(\w+)\]\s*(.*)$/);
+      if(c)out.push({k:"callout",kind:c[1].toLowerCase(),title:c[2],children:blocks(buf.slice(1).join("\n"))});
+      else out.push({k:"q",children:blocks(buf.join("\n"))});
+      continue;}
+    if(/^\s*(-{3,}|\*{3,})\s*$/.test(l)){fp();fl();out.push({k:"hr"});continue;}
+    if((m=l.match(/^(#{1,5})\s+(.*)/))){fp();fl();out.push({k:"h",lv:Math.min(m[1].length,4),t:m[2]});continue;}
+    if((m=l.match(/^\s*[-*•]\s+(.*)/))){fp();if(!list||list.k!=="ul"){list={k:"ul",items:[]};out.push(list);}list.items.push(m[1]);continue;}
+    if((m=l.match(/^\s*\d+[.)]\s+(.*)/))){fp();if(!list||list.k!=="ol"){list={k:"ol",items:[]};out.push(list);}list.items.push(m[1]);continue;}
+    fl();para.push(l.trim());
+  }
+  fp();return out;
+}
+const CALLOUT={formula:["Fórmula","Formula"],formula_:["Fórmula","Formula"],ejemplo:["Ejemplo resuelto","Adibide ebatzia"],importante:["Importante","Garrantzitsua"],error:["Error frecuente","Ohiko akatsa"],nota:["Nota","Oharra"]};
+const calloutKind=k=>({formula:"formula",formulas:"formula",fórmula:"formula",formula_:"formula",ejemplo:"ejemplo",example:"ejemplo",adibidea:"ejemplo",importante:"importante",important:"importante",garrantzitsua:"importante",error:"error",errores:"error",akatsa:"error",warning:"error",nota:"nota",note:"nota",oharra:"nota"})[k]||"nota";
+const calloutTitle=b=>b.title||CALLOUT[calloutKind(b.kind)][S.ui==="eu"?1:0];
+function svgData(code){
+  let c=String(code).trim();
+  if(!/xmlns=/.test(c))c=c.replace(/<svg/i,'<svg xmlns="http://www.w3.org/2000/svg"');
+  c=c.replace(/<script[\s\S]*?<\/script>/gi,"").replace(/\son\w+\s*=\s*("[^"]*"|'[^']*')/gi,"");
+  return c;
+}
+function mdBlock(b){
+  const R=rich;
+  if(b.k==="h")return `<h${b.lv+1}>${R(b.t)}</h${b.lv+1}>`;
+  if(b.k==="ul"||b.k==="ol")return `<${b.k}>${b.items.map(i=>`<li>${R(i)}</li>`).join("")}</${b.k}>`;
+  if(b.k==="q")return `<blockquote>${b.children.map(mdBlock).join("")}</blockquote>`;
+  if(b.k==="callout"){const k=calloutKind(b.kind);return `<aside class="callout c-${k}"><div class="ctitle">${R(calloutTitle(b))}</div>${b.children.map(mdBlock).join("")}</aside>`;}
+  if(b.k==="table")return `<div class="tbl"><table>${b.head?`<thead><tr>${b.head.map(c=>`<th>${R(c)}</th>`).join("")}</tr></thead>`:""}<tbody>${b.rows.map(r=>`<tr>${r.map(c=>`<td>${R(c)}</td>`).join("")}</tr>`).join("")}</tbody></table></div>`;
+  if(b.k==="math")return `<div class="mblock">${mathHtml(b.t,true)}</div>`;
+  if(b.k==="svg")return `<figure class="fig"><img alt="" src="data:image/svg+xml;charset=utf-8,${encodeURIComponent(svgData(b.code))}"></figure>`;
+  if(b.k==="code")return `<pre class="code">${esc(b.t)}</pre>`;
+  if(b.k==="hr")return "<hr>";
+  return `<p>${(b.lines||[b.t]).map(R).join("<br>")}</p>`;
+}
+function md(src){return blocks(src).map(mdBlock).join("");}
+/* Bilingüe */
+const L2=["es","eu"];
+const txtL=x=>x&&typeof x==="object"?(x[S.ui]||x.es||x.eu||""):String(x==null?"":x);
+const langIn=l=>S.ui==="eu"?(l==="eu"?"euskaraz":"gaztelaniaz"):(l==="eu"?"euskera":"castellano");
+function splitBil(txt){
+  const s=String(txt||"");const re=/^[ \t]*={2,}\s*(CASTELLANO|GAZTELANIA|EUSKARA|EUSKERA)\s*={2,}[ \t]*$/gim;const marks=[];let m;
+  while((m=re.exec(s)))marks.push({l:/^(CASTELLANO|GAZTELANIA)$/i.test(m[1])?"es":"eu",a:m.index,b:re.lastIndex});
+  if(!marks.length)return null;const o={};
+  marks.forEach((k,i)=>{const v=s.slice(k.b,i+1<marks.length?marks[i+1].a:s.length).trim();if(v)o[k.l]=v;});
+  return Object.keys(o).length?o:null;
+}
+const notesOf=tm=>tm.apuntesI||{};
+const hasNotes=tm=>L2.some(l=>notesOf(tm)[l]);
+const notesFor=(tm,l)=>{const n=notesOf(tm);return n[l||S.ui]||n[tm.idioma]||n.es||n.eu||"";};
+const qt=q=>q.L?(q.L[S.ui]||q.L.es||q.L.eu):q;
+
+/* ---------- Prompts ---------- */
+const langTxt=l=>l==="eu"?"euskera (euskara batua)":"castellano";
+const cursoP=id=>{const c=CURSOS.find(c=>c.id===id);return c?`${c.es} (${c.eu})`:id;};
+function langBlock(tm){
+  const solo=soloLang(tm),tl=targetLang(tm);
+  if(solo)return `Escribe los apuntes solo en ${langTxt(solo)}, porque la asignatura es de esa lengua. Empieza con esta línea exacta, sola:
+${solo==="eu"?"===EUSKARA===":"===CASTELLANO==="}
+Las secciones finales se llaman ${solo==="eu"?"«## Laburpena» y «## Hiztegia»":"«## Resumen» y «## Vocabulario»"}.`;
+  return `Escribe los apuntes DOS veces, con el mismo contenido y la misma estructura: primero en castellano y después en euskera (euskara batua). Empieza cada versión con esta línea exacta, sola:
+===CASTELLANO===
+===EUSKARA===
+${tl?`Las explicaciones van en castellano y en euskera, pero los ejemplos, las frases modelo y el vocabulario de estudio van en ${tl}, iguales en las dos versiones.
+`:""}Las secciones finales se llaman «## Resumen» y «## Vocabulario» en castellano, y «## Laburpena» y «## Hiztegia» en euskera.
+Las fórmulas, tablas, recuadros y dibujos aparecen en las dos versiones, con los textos traducidos (también los textos dentro de los dibujos).`;
+}
+function innoNotes(tm){if(!usesInno(tm))return "";const eu=soloLang(tm)==="eu";return `
+El centro usa el método Innovamat. Explica con su mismo enfoque, sin copiar material de Innovamat:
+- Representa los números y las operaciones con materiales y modelos visuales descritos con palabras: bloques de base 10 (centenas, decenas y unidades), la recta numérica con saltos, la tabla del 100, repartos en grupos.
+- Muestra varias estrategias para cada cálculo (descomponer, saltos en la recta, dobles y mitades, redondear y compensar, estimar antes de calcular) y, si toca en el curso, después el algoritmo.
+- Plantea preguntas del tipo «¿cómo lo has pensado?» y problemas con contextos cercanos.
+- Antes del resumen, añade una sección «## Cómo ayudar en casa» en castellano y «## Nola lagundu etxean» en euskera, con 3 a 5 consejos breves para la familia (juegos, preguntas y situaciones cotidianas para practicar este tema con el mismo enfoque).
+`;}
+function innoExam(tm){return usesInno(tm)?`
+El centro usa el método Innovamat: incluye preguntas de estimación, problemas con contextos cercanos y, si hay preguntas de respuesta corta, alguna del tipo «explica cómo lo has pensado». Cuando haga falta un modelo visual, descríbelo con palabras (por ejemplo, «3 decenas y 4 unidades» o «en la recta numérica, del 25 salta 10»).`:"";}
+function compBlock(tm){const c=currOf(tm);return c?`
+Competencias específicas de la materia en el currículo vasco (Decreto 77/2023), que deben guiar los apuntes:
+${c.comp.map(x=>"- "+x).join("\n")}
+`:"";}
+function formatoBlock(tm){return `FORMATO (la app convierte esto en apuntes visuales; síguelo con cuidado):
+- Markdown: #, ##, ###, listas con -, **negrita**. Sin emojis.
+- Fórmulas, ecuaciones, unidades con exponentes y expresiones matemáticas SIEMPRE en LaTeX: $...$ dentro del texto y $$...$$ en una línea propia para las fórmulas destacadas. Usa \frac{}{}, \vec{}, subíndices (M_{T}), potencias (10^{-11}) y \cdot. Nunca escribas una fórmula como texto plano.
+- Recuadros: una línea que empieza por "> [!tipo] Título" y debajo líneas que también empiezan por "> ". Tipos (escríbelos tal cual, en las dos lenguas): formula (cada fórmula clave, con su $$...$$ y una tabla Símbolo | Significado | Unidad), ejemplo (ejemplos resueltos por pasos: Datos, Fórmula, Sustitución, Resultado con unidades), importante (ideas clave), error (errores frecuentes).
+- Tablas Markdown (| columna | columna |, con la línea |---|---| debajo de la cabecera) para comparar, clasificar, conjugar, ordenar datos o resumir.
+- Entre 1 y 4 dibujos donde ayuden a entender: en ciencias, vectores, fuerzas, órbitas, circuitos, gráficas o montajes; en humanidades, mapas conceptuales, líneas del tiempo o esquemas; en lenguas, esquemas gramaticales. Cada dibujo en un bloque de código \`\`\`svg ... \`\`\` con SVG válido: atributo viewBox, ancho máximo 600, fondo blanco (un <rect> que lo cubra), textos de 14 px o más en font-family sans-serif, colores sobrios con buen contraste, flechas con <marker>, sin scripts ni imágenes externas. Justo debajo, una línea en cursiva con el pie: *Figura: …*.
+- Usa en cada materia lo que de verdad encaje: no fuerces fórmulas ni dibujos donde no aportan.`;}
+function p1(tm){
+  if(tm.modo==="curr")return p1curr(tm);
+  const n=(S.imgs[tm.id]||[]).length;
+  return `Eres profesor/a de ${tm.materia} de ${cursoP(tm.curso)} en el País Vasco. ${n?`Te adjunto ${n} foto${n>1?"s":""}`:"Te adjunto fotos"} de los apuntes de un/a estudiante sobre el tema «${tm.titulo}», en orden. Los apuntes originales están en ${langTxt(tm.idioma)}.
+${compBlock(tm)}${innoNotes(tm)}
+Haz lo siguiente:
+1. Transcribe los apuntes completos, respetando su orden y su estructura.
+2. Corrige los errores de contenido, ortografía o gramática. Escribe cada corrección así: ~~texto incorrecto~~ **texto correcto**
+3. Completa lo que falte o esté incompleto para el nivel de ${cursoP(tm.curso)}, sin alargarlo demasiado. Marca todo lo que añadas entre dobles signos igual: ==texto añadido==
+4. Si algo no se puede leer, escribe [ilegible].
+5. Al final añade una sección de resumen con 5 a 8 ideas clave y una sección de vocabulario con los términos importantes y su definición.
+
+${langBlock(tm)}
+Las marcas de corrección (~~ ~~ **) y de añadido (== ==) deben aparecer en ${soloLang(tm)?"el texto":"las dos versiones, en el mismo sitio"}.
+
+${formatoBlock(tm)}
+No escribas nada fuera de ${soloLang(tm)?"los apuntes":"las dos versiones"}.`;
+}
+function p1curr(tm){
+  const calc=["mat","cn"].includes(tm.matKey);
+  return `Eres profesor/a de ${tm.materia} de ${cursoP(tm.curso)} en el País Vasco. Escribe unos apuntes claros y completos para que un/a estudiante de ${cursoP(tm.curso)} estudie el tema «${tm.titulo}», según el currículo vasco.
+${compBlock(tm)}${innoNotes(tm)}
+Los apuntes deben:
+1. Explicar el tema por apartados, con lenguaje adecuado para la edad y sin pasar del nivel del curso.
+2. Incluir ejemplos concretos${calc?" y varios ejemplos resueltos paso a paso":""}.
+3. Incluir un apartado de errores frecuentes.
+4. Terminar con una sección de resumen (5 a 8 ideas clave) y una sección de vocabulario con los términos importantes y su definición.
+Marca en **negrita** lo más importante. No uses las marcas ~~ ~~ ni == == (no hay apuntes originales que corregir).
+
+${langBlock(tm)}
+
+${formatoBlock(tm)}
+No escribas nada fuera de ${soloLang(tm)?"los apuntes":"las dos versiones"}.`;
+}
+const TIPO_P={test:"tipo test (4 opciones, una correcta)",vf:"verdadero o falso",huecos:"rellenar huecos",corta:"respuesta corta (1 a 3 frases)",desarrollo:"pregunta de desarrollo"};
+const TIPO_EJ={
+  test:`{"tipo":"test","correcta":0,"es":{"enunciado":"...","opciones":["...","...","...","..."],"explicacion":"..."},"eu":{"enunciado":"...","opciones":["...","...","...","..."],"explicacion":"..."}}`,
+  vf:`{"tipo":"vf","correcta":true,"es":{"enunciado":"...","explicacion":"..."},"eu":{"enunciado":"...","explicacion":"..."}}`,
+  huecos:`{"tipo":"huecos","es":{"enunciado":"La capital de Bizkaia es ___.","respuestas":["Bilbao|Bilbo"],"explicacion":"..."},"eu":{"enunciado":"Bizkaiko hiriburua ___ da.","respuestas":["Bilbo|Bilbao"],"explicacion":"..."}}`,
+  corta:`{"tipo":"corta","es":{"enunciado":"...","respuesta_modelo":"...","criterios":"...","explicacion":"..."},"eu":{"enunciado":"...","respuesta_modelo":"...","criterios":"...","explicacion":"..."}}`,
+  desarrollo:`{"tipo":"desarrollo","es":{"enunciado":"...","respuesta_modelo":"...","criterios":"...","explicacion":"..."},"eu":{"enunciado":"...","respuesta_modelo":"...","criterios":"...","explicacion":"..."}}`};
+const TIPO_R={
+  test:`- "test": 4 opciones, en el mismo orden en las dos lenguas; "correcta" es el índice (0 a 3) de la opción correcta. Varía la posición de la correcta.`,
+  vf:`- "vf": "correcta" es true o false. Mezcla afirmaciones verdaderas y falsas.`,
+  huecos:`- "huecos": escribe ___ (tres guiones bajos) en cada hueco del enunciado, con el mismo número de huecos en las dos lenguas; "respuestas" tiene una respuesta por hueco, en orden. Si se admiten varias formas, sepáralas con | (por ejemplo "Bilbao|Bilbo").`,
+  corta:`- "corta": incluye "respuesta_modelo" y "criterios" de corrección.`,
+  desarrollo:`- "desarrollo": incluye "respuesta_modelo" completa y "criterios" de corrección.`};
+function p2(tm){
+  const c=tm.cfg, tp=TIPOS.filter(x=>c.tipos.includes(x)), dif={facil:"fácil",media:"media",dificil:"difícil"}[c.dif];
+  const solo=soloLang(tm), tl=targetLang(tm);
+  let ej=tp.map(x=>"  "+TIPO_EJ[x]);
+  if(solo){ej=ej.map(e=>{const o=JSON.parse(e);delete o[solo==="eu"?"es":"eu"];return "  "+JSON.stringify(o);});}
+  const lang=solo?`Escribe el examen solo en ${langTxt(solo)} (clave "${solo}"), porque la asignatura es de esa lengua. "tipo" y "correcta" van fuera.`
+    :`Escribe cada pregunta en castellano ("es") y en euskera batua ("eu"), con el mismo contenido. "tipo" y "correcta" son comunes a las dos lenguas.`;
+  const tlr=tl?`
+El examen evalúa el ${tl}: las frases, opciones, huecos y respuestas esperadas van en ${tl} y son iguales en "es" y en "eu"; solo las instrucciones de cada pregunta se traducen.`:"";
+  return `Eres profesor/a de ${tm.materia} de ${cursoP(tm.curso)}. A partir de los apuntes de abajo, prepara un examen de ${c.n} preguntas de dificultad ${dif}.
+Tipos de pregunta (repártelos de forma equilibrada): ${tp.map(x=>TIPO_P[x]).join(", ")}.
+${lang}${tlr}${innoExam(tm)}
+Todas las preguntas deben poder responderse con los apuntes.
+
+Responde SOLO con un bloque JSON válido, sin texto antes ni después, con esta estructura:
+{"titulo":${solo?`{"${solo}":"..."}`:'{"es":"...","eu":"..."}'},"preguntas":[
+${ej.join(",\n")}
+]}
+
+Reglas:
+${tp.map(x=>TIPO_R[x]).join("\n")}
+- Incluye siempre una "explicacion" breve.
+- Si hay fórmulas o expresiones matemáticas, escríbelas en LaTeX entre $...$ (en enunciados, opciones, respuestas modelo y explicaciones). Dentro del JSON escribe las barras invertidas dobles, por ejemplo "$\\frac{a}{b}$". En los huecos, la respuesta esperada va sin LaTeX.
+
+APUNTES:
+"""
+${notesFor(tm,solo||tm.idioma)}
+"""`;
+}
+function p3(tm,it){
+  const lines=[];
+  it.preguntas.forEach((q,i)=>{const r=it.res[i];if(!r||!r.pend)return;const x=q.L?(q.L[tm.idioma]||q.L.es||q.L.eu):q;
+    lines.push(`[id ${i+1}] (${q.tipo==="corta"?"respuesta corta":"desarrollo"})
+Enunciado: ${x.enunciado}
+Respuesta modelo: ${x.respuesta_modelo||"-"}
+Criterios: ${x.criterios||"-"}
+Respuesta del estudiante: ${(it.resp[i]||"").trim()||"(en blanco)"}`);});
+  return `Eres profesor/a de ${tm.materia} de ${cursoP(tm.curso)}. Corrige las respuestas escritas de un/a estudiante (puede haber respondido en castellano o en euskera). Sé justo/a y anima, pero señala los errores con claridad.
+Para cada pregunta da una nota de 0 a 10 y un comentario breve: qué está bien y qué falta. Escribe el comentario en castellano ("es") y en euskera batua ("eu").
+
+Responde SOLO con JSON, sin texto antes ni después:
+{"correcciones":[{"id":1,"nota":7,"comentario":{"es":"...","eu":"..."}}]}
+
+PREGUNTAS:
+
+${lines.join("\n\n")}`;
+}
+
+/* ---------- Lectura de JSON pegado ---------- */
+const TEXCMD="frac|dfrac|tfrac|vec|cdot|times|text|mathrm|sqrt|alpha|beta|gamma|delta|Delta|theta|lambda|mu|nu|pi|rho|sigma|tau|phi|omega|Omega|approx|neq|leq|geq|infty|left|right|overrightarrow|hat|bar|sum|int|pm|circ|degree|quad|ldots|cdots|propto|rightarrow|Rightarrow|to|epsilon|varepsilon|eta|Sigma|partial|nabla|overline|mathbf|div|equiv|sim|le|ge|ne|in|angle|perp|parallel|hbar|ell";
+function parseJSON(txt){
+  let s=String(txt||"").trim().replace(new RegExp("(^|[^\\\\])\\\\(?=(?:"+TEXCMD+")(?![a-zA-Z]))","g"),"$1\\\\").replace(/^```(?:json)?/i,"").replace(/```\s*$/,"");
+  const a=s.indexOf("{"),b=s.lastIndexOf("}");if(a<0||b<a)throw new Error("nojson");
+  s=s.slice(a,b+1);
+  try{return JSON.parse(s);}catch(e){return JSON.parse(s.replace(/[“”]/g,'"').replace(/,\s*([}\]])/g,"$1"));}
+}
+const ALIAS={test:"test",multiple:"test",opcion_multiple:"test",tipo_test:"test",vf:"vf",verdadero_falso:"vf",egia_gezurra:"vf",truefalse:"vf",huecos:"huecos",rellenar:"huecos",rellenar_huecos:"huecos",hutsuneak:"huecos",corta:"corta",respuesta_corta:"corta",laburra:"corta",desarrollo:"desarrollo",garapena:"desarrollo"};
+function cleanLang(tipo,p){
+  if(!p||typeof p!=="object")return null;
+  const enunciado=String(p.enunciado||p.pregunta||p.question||"").trim();if(!enunciado)return null;
+  const x={enunciado,explicacion:String(p.explicacion||p.azalpena||"")};
+  if(tipo==="test"){const op=p.opciones||p.options||[];if(!Array.isArray(op)||op.length<2)return null;x.opciones=op.map(String);}
+  else if(tipo==="huecos"){let r=p.respuestas||p.respuesta||[];if(!Array.isArray(r))r=[r];r=r.map(String).filter(Boolean);if(!r.length)return null;
+    let e=enunciado;const n=(e.match(/_{3,}/g)||[]).length;if(n<r.length)e+=" ___".repeat(r.length-n);x.enunciado=e;x.respuestas=r;}
+  else if(tipo==="corta"||tipo==="desarrollo"){x.respuesta_modelo=String(p.respuesta_modelo||p.modelo||"");x.criterios=String(p.criterios||"");}
+  return x;
+}
+function cleanExam(o){
+  const arr=o.preguntas||o.questions||o.galderak||[];const out=[];
+  for(const p of Array.isArray(arr)?arr:[]){
+    if(!p)continue;
+    const tipo=ALIAS[String(p.tipo||p.type||"").toLowerCase().replace(/[\s/-]+/g,"_")];if(!tipo)continue;
+    const src={es:p.es||p.castellano||p.gaztelania,eu:p.eu||p.euskara||p.euskera};
+    if(!src.es&&!src.eu)src.es=p;
+    const L={};L2.forEach(l=>{const v=cleanLang(tipo,src[l]);if(v)L[l]=v;});
+    const ls=Object.values(L);if(!ls.length)continue;
+    const q={tipo,L};
+    if(tipo==="test"){let c=p.correcta;if(typeof c==="string"&&/^\d+$/.test(c))c=+c;
+      if(typeof c==="string"){const s=c;c=-1;ls.forEach(x=>{const i=x.opciones.indexOf(s);if(i>=0)c=i;});}
+      const min=Math.min(...ls.map(x=>x.opciones.length));if(typeof c!=="number"||c<0||c>=min)continue;q.correcta=c;}
+    else if(tipo==="vf"){let c=p.correcta;if(typeof c==="string")c=/^(true|verdadero|egia|v|t|sí|si|bai)$/i.test(c.trim());if(typeof c!=="boolean")continue;q.correcta=c;}
+    out.push(q);
+  }
+  const ti=o.titulo||o.title;
+  return {titulo:ti&&typeof ti==="object"?{es:String(ti.es||ti.eu||""),eu:String(ti.eu||ti.es||"")}:String(ti||""),preguntas:out};
+}
+const norm=s=>String(s||"").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/[.,;:!?¡¿"'«»()]/g,"").replace(/\s+/g," ").trim();
+function grade(q,a){
+  if(q.tipo==="test"||q.tipo==="vf")return{score:a===q.correcta?1:0};
+  if(q.tipo==="huecos"){const arr=a||[];const ls=q.L?Object.values(q.L):[q];const n=Math.max(...ls.map(x=>x.respuestas.length));let ok=0;const det=[];
+    for(let j=0;j<n;j++){const alts=ls.flatMap(x=>String(x.respuestas[j]||"").split("|")).map(norm).filter(Boolean);const g=alts.includes(norm(arr[j]));if(g)ok++;det.push(g);}
+    return{score:ok/n,det};}
+  return{pend:true};
+}
+function notaDe(it){const rs=it.preguntas.map((q,i)=>it.res[i]||{});const done=rs.filter(r=>typeof r.score==="number");if(!done.length)return null;return done.reduce((s,r)=>s+r.score,0)/done.length*10;}
+const pendientes=it=>it.preguntas.filter((q,i)=>it.res[i]&&it.res[i].pend).length;
+const estado=r=>!r?"pend":r.pend?"pend":r.score>=1?"ok":r.score>0?"part":"bad";
+
+/* ---------- Componentes ---------- */
+function pblock(key,title,how,text){
+  return `<section class="card pblock"><h2>${esc(title)}</h2><ol class="how">${how.map(h=>`<li>${esc(h)}</li>`).join("")}</ol>
+  <div class="row"><button class="btn pri" data-a="copy" data-k="${key}">${t("copiar")}</button><a class="btn" href="https://claude.ai/new" target="_blank" rel="noopener">${t("abrirClaude")} ↗</a></div>
+  <details id="d-${key}"><summary>${t("verPrompt")}</summary><textarea class="pt" id="pt-${key}" readonly>${esc(text)}</textarea></details></section>`;
+}
+function temaMeta(tm){return `<div class="meta"><span class="chip">${esc(cursoLbl(tm.curso))}</span><span class="chip">${esc(tm.materia)}</span><span class="chip">${tm.idioma==="eu"?t("eus"):t("cas")}</span>${tm.ejemplo?`<span class="chip ex">${t("ejemplo")}</span>`:""}</div>`;}
+
+/* ---------- Vistas ---------- */
+/* ---------- Perfiles, asignaturas y evaluaciones ---------- */
+const perfilAct=()=>S.perfiles.find(p=>p.id===S.perfil)||null;
+const temasPerfil=()=>S.temas.filter(x=>x.perfilId===S.perfil);
+const asigKey=tm=>tm.matKey?"k:"+tm.matKey:"t:"+norm(tm.materia);
+const asigName=(key,fallback)=>{if(key.startsWith("k:")){const m=M[key.slice(2)];if(m)return m[S.ui==="eu"?1:0];}return fallback||key.slice(2);};
+const lastCorr=tm=>(tm.intentos||[]).filter(i=>i.fase==="corregido").slice(-1)[0];
+const notaTema=tm=>{const l=lastCorr(tm);return l?notaDe(l):null;};
+const fallosTema=tm=>{const l=lastCorr(tm);if(!l)return 0;return l.preguntas.filter((q,i)=>l.res[i]&&typeof l.res[i].score==="number"&&l.res[i].score<1).length;};
+const abierto=tm=>(tm.intentos||[]).filter(i=>i.fase==="haciendo").slice(-1)[0];
+const evalDefault=()=>{const m=new Date().getMonth();return m>=8&&m<=11?1:m<=2?2:3;};
+const FILTROS={todos:()=>true,sinApuntes:tm=>!hasNotes(tm),sinExamen:tm=>hasNotes(tm)&&!(tm.intentos||[]).length,aMedias:tm=>!!abierto(tm),
+  suspendidos:tm=>{const n=notaTema(tm);return n!=null&&n<5;},conFallos:tm=>fallosTema(tm)>0};
+function ordenar(list){const o=S.orden||"recientes";const l=list.slice();
+  if(o==="alfa")l.sort((a,b)=>a.titulo.localeCompare(b.titulo,S.ui));
+  else if(o==="nota")l.sort((a,b)=>{const x=notaTema(a),y=notaTema(b);return (x==null?99:x)-(y==null?99:y);});
+  else l.sort((a,b)=>(b.mod||0)-(a.mod||0));return l;}
+function filtrar(list){const q=norm(S.q||""),f=FILTROS[S.filtro||"todos"]||FILTROS.todos;
+  return list.filter(tm=>f(tm)&&(!q||norm(tm.titulo).includes(q)||norm(tm.materia).includes(q)));}
+function cursoVista(){const p=perfilAct();return S.cursoVer||(p&&p.curso)||"dbh1";}
+function repasar(list){
+  const out=[],now=Date.now(),DIA=86400000;
+  list.forEach(tm=>{const ab=abierto(tm),n=notaTema(tm),f=fallosTema(tm);
+    if(ab)out.push({tm,why:t("rp_medias"),cls:"pend",a:"openInt",iid:ab.id,p:0});
+    else if(n!=null&&n<5)out.push({tm,why:t("rp_susp",{n:fmtNota(n)}),cls:"bad",p:1});
+    else if(f>0)out.push({tm,why:t("rp_fallos",{n:f}),cls:"part",p:2});
+    else if(lastCorr(tm)&&now-(tm.mod||0)>14*DIA)out.push({tm,why:t("rp_tiempo"),cls:"pend",p:3});});
+  return out.sort((a,b)=>a.p-b.p).slice(0,6);
+}
+function tRow(tm,opts){
+  opts=opts||{};const ints=tm.intentos||[],n=notaTema(tm),ab=abierto(tm),f=fallosTema(tm);
+  const st=!hasNotes(tm)?`<span class="pill pend">${t("f_sinApuntes")}</span>`:!ints.length?`<span class="pill pend">${t("f_sinExamen")}</span>`:ab?`<span class="pill part">${t("f_aMedias")}</span>`:"";
+  return `<button class="tcard" data-a="open" data-id="${tm.id}"><div class="qhead"><h3>${esc(tm.titulo)}</h3>${n!=null?`<span class="nota ${n>=5?"ok":"bad"}">${fmtNota(n)}</span>`:""}</div>
+    <div class="meta">${opts.asig?`<span class="chip">${esc(asigName(asigKey(tm),tm.materia))}</span>`:""}${tm.eval?`<span class="chip">${t("evN",{n:tm.eval})}</span>`:""}${tm.ejemplo?`<span class="chip ex">${t("ejemplo")}</span>`:""}${st}${f?`<span class="pill part">${t("nFallos",{n:f})}</span>`:""}</div></button>`;
+}
+function barraFiltros(){
+  return `<div class="field"><input class="search" type="search" id="qBuscar" data-in="q" value="${esc(S.q||"")}" placeholder="${esc(t("buscarPh"))}" aria-label="${esc(t("buscarPh"))}" autocomplete="off">
+    <div class="tipos">${Object.keys(FILTROS).map(k=>`<button class="tog" data-a="filtro" data-v="${k}" aria-pressed="${(S.filtro||"todos")===k}">${t("f_"+k)}</button>`).join("")}</div>
+    <div class="row"><label class="flabel" for="sOrden">${t("ordenar")}</label><select class="sel" id="sOrden" data-ch="orden" style="max-width:200px">${["recientes","alfa","nota"].map(o=>`<option value="${o}" ${(S.orden||"recientes")===o?"selected":""}>${t("o_"+o)}</option>`).join("")}</select></div></div>`;
+}
+function top(back){
+  const p=perfilAct();
+  const left=back?`<button class="ghost" data-a="${back}">← ${t(back==="home"?"volver":back==="backAsig"?"volverAsig":back==="perfiles"?"volver":"volverTema")}</button>`:`<div class="brand"><span>Ikasi</span></div>`;
+  return `<header class="top">${left}<div class="row" style="gap:8px">${p&&S.view.name!=="perfiles"?`<button class="pchip" data-a="perfiles" aria-label="${esc(t("cambiarPerfil"))}"><span class="av">${esc((p.nombre||"?").trim().charAt(0).toUpperCase())}</span>${esc(p.nombre)}</button>`:""}
+  <div class="seg" role="group" aria-label="Hizkuntza / Idioma"><button data-a="ui" data-v="es" aria-pressed="${S.ui==="es"}">ES</button><button data-a="ui" data-v="eu" aria-pressed="${S.ui==="eu"}">EU</button></div></div></header>`;
+}
+function vPerfiles(){
+  const cards=S.perfiles.map(p=>{const n=S.temas.filter(x=>x.perfilId===p.id&&!x.archivado).length;
+    if(S.editPerfil===p.id)return `<section class="card">${perfilForm(p)}</section>`;
+    return `<div class="tcard" style="cursor:default"><div class="qhead"><button class="ghost" style="color:var(--ink);font-size:19px;text-align:left;padding:0" data-a="usePerfil" data-id="${p.id}"><span class="av big">${esc(p.nombre.charAt(0).toUpperCase())}</span> ${esc(p.nombre)}</button>
+      <button class="btn small" data-a="editPerfil" data-id="${p.id}">${t("editar")}</button></div>
+      <div class="meta"><span class="chip">${esc(cursoLbl(p.curso))}</span><span class="chip">${n===1?t("tema1"):t("temasN",{n})}</span></div>
+      <div><button class="btn pri small" data-a="usePerfil" data-id="${p.id}">${t("entrar")}</button></div></div>`;}).join("");
+  return `${top(S.perfil?"home":null)}<section class="hero"><h1>${t("quien")}</h1></section>
+  <div class="list">${cards}</div>
+  ${S.editPerfil==="new"?`<section class="card">${perfilForm(null)}</section>`:`<div><button class="btn" data-a="editPerfil" data-id="new">+ ${t("nuevoPerfil")}</button></div>`}`;
+}
+function perfilForm(p){
+  const del=p&&S.perfiles.length>1;
+  return `<form class="form" id="fPerfil" style="display:flex;flex-direction:column;gap:12px">
+    <label for="pNombre">${t("nombre")}<input id="pNombre" required maxlength="30" value="${esc(p?p.nombre:"")}"></label>
+    <label for="pCurso">${t("curso")}<select id="pCurso">${CURSOS.map(c=>`<option value="${c.id}" ${(p?p.curso:"dbh1")===c.id?"selected":""}>${esc(c[S.ui])}</option>`).join("")}</select></label>
+    <div class="row"><button type="button" class="btn" data-a="cancelPerfil">${t("cancelar")}</button><button type="submit" class="btn pri">${t("guardar")}</button></div>
+    ${del?(S.confirmDelP===p.id?`<p class="help">${t("confirmarPerfil")}</p><div class="row"><button type="button" class="btn small" data-a="noDelPerfil">${t("cancelar")}</button><button type="button" class="btn small danger" data-a="delPerfil" data-id="${p.id}">${t("siBorrar")}</button></div>`
+      :`<div><button type="button" class="btn small danger" data-a="askDelPerfil" data-id="${p.id}">${t("borrarPerfil")}</button></div>`):""}
+  </form>`;
+}
+function vHome(){
+  const p=perfilAct();if(!p)return vPerfiles();
+  const curso=cursoVista(),all=temasPerfil().filter(x=>!x.archivado),enCurso=all.filter(x=>x.curso===curso);
+  const conTemas=new Set(all.map(x=>x.curso));
+  const arch=temasPerfil().filter(x=>x.archivado).length;
+  const activo=(S.q||"").trim()||(S.filtro&&S.filtro!=="todos");
+  let cuerpo;
+  if(activo){const res=ordenar(filtrar(enCurso));cuerpo=`<div class="list">${res.map(tm=>tRow(tm,{asig:true})).join("")||`<p class="empty">${t("sinResultados")}</p>`}</div>`;}
+  else{
+    const g={};enCurso.forEach(tm=>{const k=asigKey(tm);(g[k]=g[k]||{k,name:tm.materia,items:[]}).items.push(tm);});
+    const asigs=Object.values(g).sort((a,b)=>asigName(a.k,a.name).localeCompare(asigName(b.k,b.name),S.ui));
+    cuerpo=asigs.length?`<div class="agrid">${asigs.map(a=>{const ns=a.items.map(notaTema).filter(x=>x!=null),med=ns.length?ns.reduce((s,x)=>s+x,0)/ns.length:null;
+      return `<button class="acard" data-a="asig" data-k="${esc(a.k)}"><span class="aname">${esc(asigName(a.k,a.name))}</span><span class="ameta">${a.items.length===1?t("tema1"):t("temasN",{n:a.items.length})}</span>${med!=null?`<span class="nota ${med>=5?"ok":"bad"}">${fmtNota(med)}</span>`:`<span class="nota pend">—</span>`}</button>`;}).join("")}</div>`
+      :`<p class="empty">${t("vacioCurso")}</p>`;
+  }
+  const rp=repasar(enCurso);
+  return `${top()}
+  ${S.storageOk?"":`<p class="err">${t("noStorage")}</p>`}
+  <section class="hero" style="padding-bottom:0"><h1>${t("hola",{n:esc(p.nombre)})}</h1>
+    <div class="row"><label class="flabel" for="sCurso">${t("curso")}</label><select class="sel" id="sCurso" data-ch="cursoVer" style="max-width:220px">${CURSOS.map(c=>`<option value="${c.id}" ${c.id===curso?"selected":""}>${esc(c[S.ui])}${conTemas.has(c.id)?" •":""}</option>`).join("")}</select>
+    <button class="btn pri" data-a="new">+ ${t("nuevoTema")}</button></div></section>
+  ${rp.length?`<section class="card"><h2 class="sec" style="margin:0">${t("paraRepasar")}</h2><div class="list">${rp.map(r=>`<button class="rrow" data-a="${r.a||"open"}" data-id="${r.tm.id}" ${r.iid?`data-iid="${r.iid}"`:""}><span><b>${esc(r.tm.titulo)}</b><span class="ameta"> · ${esc(asigName(asigKey(r.tm),r.tm.materia))}</span></span><span class="pill ${r.cls}">${esc(r.why)}</span></button>`).join("")}</div></section>`:""}
+  ${enCurso.length?barraFiltros():""}
+  ${cuerpo}
+  ${arch?`<div><button class="ghost" data-a="arch">${t("verArchivados",{n:arch})}</button></div>`:""}
+  ${bkSection()}
+  <p class="fine">${t("storageNote")}</p>`;
+}
+function bkSection(){
+  return `<section class="card" id="backup"><h2 class="sec" style="margin:0">${t("backup")}</h2>
+    ${pendBk()?`<div class="fb bad"><b>${t("bkPend")}</b><span>${t("bkPendHelp")}</span></div>`:""}
+    <p class="help">${t("backupHelp")}</p>
+    <label class="row" style="gap:8px;font-size:15px" for="bkFotos"><input type="checkbox" id="bkFotos" ${S.bkFotos?"checked":""} style="width:20px;height:20px">${t("bkFotos")}</label>
+    <div class="row"><button class="btn pri small" data-a="bkSave">${t("bkDescargar")}</button>${canShareFiles()?`<button class="btn small" data-a="bkShare">${t("bkCompartir")}</button>`:""}
+      <label class="btn small"><input type="file" accept=".json,application/json" data-restore hidden>${t("bkRestaurar")}</label></div>
+    <p class="fine">${S.lastBackup?t("bkUltima",{f:esc(fecha(S.lastBackup))}):t("bkNunca")}${S.persist?" "+t("bkPersist"):""}</p>
+  </section>`;
+}
+function vAsig(){
+  const p=perfilAct();if(!p)return vPerfiles();
+  const k=S.view.k,curso=cursoVista(),items=temasPerfil().filter(x=>!x.archivado&&x.curso===curso&&asigKey(x)===k);
+  const name=asigName(k,items[0]&&items[0].materia);
+  const list=ordenar(filtrar(items));
+  const grupos=[1,2,3,0].map(ev=>({ev,items:list.filter(x=>(x.eval||0)===ev)})).filter(g=>g.items.length);
+  const ns=items.map(notaTema).filter(x=>x!=null),med=ns.length?ns.reduce((s,x)=>s+x,0)/ns.length:null;
+  return `${top("home")}
+  <div class="thead"><h1>${esc(name)}</h1><div class="meta"><span class="chip">${esc(cursoLbl(curso))}</span><span class="chip">${items.length===1?t("tema1"):t("temasN",{n:items.length})}</span>${med!=null?`<span class="chip">${t("media")}: ${fmtNota(med)}</span>`:""}</div></div>
+  <div><button class="btn pri" data-a="newAsig">+ ${t("nuevoTema")}</button></div>
+  ${items.length?barraFiltros():""}
+  ${grupos.map(g=>`<details class="egrp" open><summary><span>${g.ev?t("evalN",{n:g.ev}):t("sinEval")}</span><span class="ameta">${g.items.length}</span></summary><div class="list">${g.items.map(tm=>tRow(tm)).join("")}</div></details>`).join("")||`<p class="empty">${items.length?t("sinResultados"):t("vacioAsig")}</p>`}`;
+}
+function vArch(){
+  const list=ordenar(temasPerfil().filter(x=>x.archivado));
+  return `${top("home")}<div class="thead"><h1>${t("archivados")}</h1></div>
+  <div class="list">${list.map(tm=>`<div class="tcard" style="cursor:default"><h3>${esc(tm.titulo)}</h3><div class="meta"><span class="chip">${esc(cursoLbl(tm.curso))}</span><span class="chip">${esc(asigName(asigKey(tm),tm.materia))}</span>${tm.eval?`<span class="chip">${t("evN",{n:tm.eval})}</span>`:""}</div>
+    <div class="row"><button class="btn small" data-a="open" data-id="${tm.id}">${t("ver")}</button><button class="btn small" data-a="unarch" data-id="${tm.id}">${t("desarchivar")}</button></div></div>`).join("")||`<p class="empty">${t("sinArchivados")}</p>`}</div>`;
+}
+function vNew(){
+  const pre=S.nPre||{},cur0=pre.curso||cursoVista();
+  return `${top(pre.k?"backAsig":"home")}<h1 style="font-size:30px;font-weight:800">${t("nuevoTema")}</h1>
+  <form class="card form" id="fNew">
+    <label for="nCurso">${t("curso")}<select id="nCurso">${CURSOS.map(c=>`<option value="${c.id}" ${c.id===cur0?"selected":""}>${esc(c[S.ui])}</option>`).join("")}</select></label>
+    <label for="nMateria">${t("materia")}<select id="nMateria" required>${matOptions(cur0,pre.k)}</select></label>
+    <label for="nOtra" id="otraWrap" hidden>${t("otraMat")}<input id="nOtra" maxlength="60"></label>
+    <label for="nTema" id="temaWrap" hidden>${t("temaCurr")}<select id="nTema"></select></label>
+    <label for="nTitulo">${t("titulo")}<input id="nTitulo" required maxlength="80" placeholder="${esc(t("tituloPh"))}"></label>
+    <label for="nInno" id="innoWrap" class="row" style="flex-direction:row;gap:8px;font-weight:400" hidden><input type="checkbox" id="nInno" ${S.prefInno!==false?"checked":""} style="width:20px;height:20px">${t("innoLbl")}</label>
+    <fieldset><legend>${t("evaluacion")}</legend><div class="seg" role="radiogroup">${[1,2,3].map(n=>`<button type="button" data-a="nEval" data-v="${n}" aria-pressed="${S.nEval===n}">${t("evN",{n})}</button>`).join("")}</div></fieldset>
+    <fieldset><legend>${t("modoQ")}</legend><div class="seg" role="radiogroup">
+      <button type="button" data-a="nModo" data-v="fotos" aria-pressed="${S.nModo!=="curr"}">${t("modoFotos")}</button>
+      <button type="button" data-a="nModo" data-v="curr" aria-pressed="${S.nModo==="curr"}">${t("modoCurr")}</button></div></fieldset>
+    <fieldset><legend>${t("idioma")}</legend><div class="seg" role="radiogroup">
+      <button type="button" data-a="nIdioma" data-v="eu" aria-pressed="${S.nIdioma==="eu"}">${t("eus")}</button>
+      <button type="button" data-a="nIdioma" data-v="es" aria-pressed="${S.nIdioma==="es"}">${t("cas")}</button></div></fieldset>
+    <div class="row"><button type="button" class="btn" data-a="${pre.k?"backAsig":"home"}">${t("cancelar")}</button><button type="submit" class="btn pri">${t("crear")}</button></div>
+  </form>`;
+}
+function vTema(){
+  const tm=cur();if(!tm){S.view={name:"home"};return vHome();}
+  const tab=S.view.tab||"scan", imgs=S.imgs[tm.id]||[];
+  const st=[["scan",tm.modo==="curr"?"s_prep":"s_scan",tm.modo==="curr"?hasNotes(tm):imgs.length>0],["notes","s_notes",hasNotes(tm)],["exam","s_exam",tm.intentos.length>0],["hist","s_hist",tm.intentos.some(i=>i.fase==="corregido")]];
+  let body="";
+  const innoT=innoEligible(tm.curso,tm.matKey,tm.materia)?`<label class="row" for="tInno" style="gap:8px;font-size:15px"><input type="checkbox" id="tInno" ${tm.innovamat?"checked":""} style="width:20px;height:20px">${t("innoLbl")}</label>`:"";
+  const modoSeg=innoT+`<div class="seg" role="group"><button data-a="modo" data-v="fotos" aria-pressed="${tm.modo!=="curr"}">${t("conFotos")}</button><button data-a="modo" data-v="curr" aria-pressed="${tm.modo==="curr"}">${t("sinApuntesM")}</button></div>`;
+  if(tab==="scan"&&tm.modo==="curr"){
+    body=`<section class="card">${modoSeg}<p class="help">${t("currHelp",{t:esc(tm.titulo)})}</p></section>
+    ${pblock("p1",t("p0Title"),t("p0How"),p1(tm))}
+    <button class="btn wide" data-a="tab" data-v="notes">${t("sigApuntes")} →</button>`;
+  } else   if(tab==="scan"){
+    body=`<section class="card">${modoSeg}<p class="help">${t("scanHelp")}</p>
+      <div class="row"><button class="btn pri" data-a="burst">${t("camara")}</button>
+      <label class="btn"><input type="file" accept="image/*" multiple data-file hidden>${t("galeria")}</label></div>
+      ${imgs.length?`<div class="thumbs">${imgs.map((src,i)=>`<figure class="th"><img src="${src}" alt="${t("pagina")} ${i+1}"><figcaption>${i+1}</figcaption><button class="x" data-a="delImg" data-i="${i}" aria-label="${t("borrar")} ${i+1}">×</button></figure>`).join("")}</div>
+      <div class="row"><button class="btn small" data-a="share">${t("compartirFotos")}</button></div>`:""}
+    </section>
+    ${pblock("p1",t("p1Title"),t("p1How"),p1(tm))}
+    <button class="btn wide" data-a="tab" data-v="notes">${t("sigApuntes")} →</button>`;
+  } else if(tab==="notes"){
+    if(!hasNotes(tm)||S.editNotes){
+      body=`<section class="card"><label class="flabel" for="notesIn">${t("pegaApuntes")}</label>
+        <textarea class="paste" id="notesIn" data-in="borrador" style="min-height:260px">${esc(tm.borrador||"")}</textarea>
+        <div class="row">${S.editNotes?`<button class="btn" data-a="cancelEdit">${t("cancelar")}</button>`:""}<button class="btn pri" data-a="saveNotes">${t("guardarApuntes")}</button></div></section>`;
+    } else {
+      const n=notesOf(tm),falta=L2.filter(l=>!n[l]);
+      body=`<section class="card"><div class="row" style="justify-content:space-between"><div class="legend"><span><span class="k-add">${t("leyAdd")}</span></span><span><del>abc</del> <span class="k-fix">${t("leyFix")}</span></span></div>
+        <button class="btn small" data-a="editNotes">${t("editar")}</button></div>
+        ${falta.length&&!soloLang(tm)?`<p class="help">${t("soloUno",{l:langIn(L2.find(l=>n[l]))})}</p>`:""}
+        <article class="notes">${md(notesFor(tm))}</article>
+        <div class="row"><span class="flabel">${t("descargar")}:</span><button class="btn small" data-a="exp" data-w="notes" data-f="pdf">PDF</button><button class="btn small" data-a="exp" data-w="notes" data-f="docx">Word</button></div></section>
+        <button class="btn wide pri" data-a="tab" data-v="exam">${t("sigExamen")} →</button>`;
+    }
+  } else if(tab==="exam"){
+    if(!hasNotes(tm)){body=`<section class="card"><p class="help">${t("noApuntes")}</p><div><button class="btn" data-a="tab" data-v="notes">${t("irApuntes")}</button></div></section>`;}
+    else{
+      const c=tm.cfg, open=tm.intentos.filter(i=>i.fase==="haciendo").slice(-1)[0];
+      body=`${open?`<section class="card resume"><div class="row" style="justify-content:space-between"><strong>${t("enCurso")}</strong><button class="btn small pri" data-a="openInt" data-id="${open.id}">${t("seguir")}</button></div></section>`:""}
+      <section class="card">
+        <div class="field"><span class="flabel">${t("tipos")}</span><div class="tipos">${TIPOS.map(x=>`<button class="tog" data-a="tipo" data-v="${x}" aria-pressed="${c.tipos.includes(x)}">${t("t_"+x)}</button>`).join("")}</div>
+        ${c.tipos.length?"":`<p class="err">${t("minTipo")}</p>`}</div>
+        <div class="row" style="gap:22px;align-items:flex-end">
+          <div class="field"><label class="flabel" for="nPreg">${t("numero")}</label><select class="sel" id="nPreg" data-ch="n">${[5,10,15,20,25,30].map(n=>`<option ${n===c.n?"selected":""}>${n}</option>`).join("")}</select></div>
+          <div class="field"><span class="flabel">${t("dificultad")}</span><div class="seg">${["facil","media","dificil"].map(d=>`<button data-a="dif" data-v="${d}" aria-pressed="${c.dif===d}">${t(d)}</button>`).join("")}</div></div>
+        </div></section>
+      ${c.tipos.length?pblock("p2",t("p2Title"),t("p2How"),p2(tm)):""}
+      <section class="card"><label class="flabel" for="examIn">${t("pegaExamen")}</label>
+        <textarea class="paste" id="examIn" data-in="examPaste">${esc(tm.examPaste||"")}</textarea>
+        ${S.err?`<p class="err">${esc(S.err)}</p>`:""}
+        <div><button class="btn pri" data-a="start">${t("empezar")}</button></div></section>`;
+    }
+  } else {
+    const ints=tm.intentos.slice().reverse();
+    body=`<section class="card">${ints.length?ints.map(it=>{const n=notaDe(it),p=pendientes(it),f=it.preguntas.filter((q,i)=>it.res[i]&&typeof it.res[i].score==="number"&&it.res[i].score<1).length;
+      const cls=it.fase!=="corregido"||n==null?"pend":n>=5?"ok":"bad";
+      return `<div class="hrow"><div><strong>${esc(t("o_"+(it.origen||"nuevo")))}</strong> · ${esc(fecha(it.creado))}<div class="meta">${it.preguntas.length} ${t("preguntas")}${it.fase==="corregido"&&f?` · ${t("nFallos",{n:f})}`:""}${p&&it.fase==="corregido"?` · ${t("pend")}: ${p}`:""}</div></div>
+      <span class="nota ${cls}">${it.fase==="corregido"?fmtNota(n):"…"}</span>
+      <div class="row"><button class="btn small" data-a="openInt" data-id="${it.id}">${it.fase==="corregido"?t("ver"):t("seguir")}</button>
+      ${it.fase==="corregido"?`<button class="btn small" data-a="repeat" data-id="${it.id}">${t("repetir")}</button>`:""}
+      ${it.fase==="corregido"&&f?`<button class="btn small" data-a="fails" data-id="${it.id}">${t("fallos")}</button>`:""}</div></div>`;}).join(""):`<p class="empty">${t("histVacio")}</p>`}</section>`;
+  }
+  return `${top("backAsig")}
+  <div class="thead"><h1>${esc(tm.titulo)}</h1>${temaMeta(tm)}</div>
+  <div class="row"><span class="flabel">${t("evaluacion")}:</span><div class="seg" role="group">${[1,2,3].map(n=>`<button data-a="setEval" data-v="${n}" aria-pressed="${tm.eval===n}">${t("evN",{n})}</button>`).join("")}</div></div>
+  <nav class="steps" aria-label="Pasos">${st.map(([k,l,d],i)=>`<button data-a="tab" data-v="${k}" class="${d?"done":""}" ${tab===k?'aria-current="step"':""}><span class="n">${d&&tab!==k?"✓":i+1}</span><span class="lbl">${t(l)}</span></button>`).join("")}</nav>
+  ${body}
+  <div class="row" style="margin-top:8px">${S.confirmDel?`<p class="help" style="flex-basis:100%">${t("confirmar")}</p><button class="btn small" data-a="noDel">${t("cancelar")}</button><button class="btn small danger" data-a="delTema">${t("siBorrar")}</button>`:`<button class="btn small" data-a="archTema">${tm.archivado?t("desarchivar"):t("archivar")}</button><button class="btn small danger" data-a="askDel">${t("borrarTema")}</button>`}</div>`;
+}
+function qHtml(q,i,it){
+  const done=it.fase==="corregido",a=it.resp[i],r=it.res[i],e=estado(r),x=qt(q);
+  const pill=done?`<span class="pill ${e}">${t(e)}</span>`:"";
+  let body="",fb="";
+  if(q.tipo==="test"){
+    body=`<p class="qtext">${rich(x.enunciado)}</p><div class="opts">${x.opciones.map((o,j)=>{const cls=done?(j===q.correcta?"ok":a===j?"bad":""):"";
+      return `<button class="opt ${cls}" data-a="ans" data-q="${i}" data-v="${j}" aria-pressed="${a===j}" ${done?"disabled":""}><span class="l">${"ABCDEF"[j]||j+1}</span><span>${rich(o)}</span></button>`;}).join("")}</div>`;
+    if(done&&a!==q.correcta)fb=`<div><b>${t("correctaEra")}:</b> ${rich(x.opciones[q.correcta])}</div>`;
+  } else if(q.tipo==="vf"){
+    body=`<p class="qtext">${rich(x.enunciado)}</p><div class="vf">${[[true,"verdadero"],[false,"falso"]].map(([v,k])=>{const cls=done?(v===q.correcta?"ok":a===v?"bad":""):"";
+      return `<button class="opt ${cls}" data-a="ans" data-q="${i}" data-v="${v?"t":"f"}" aria-pressed="${a===v}" ${done?"disabled":""}>${t(k)}</button>`;}).join("")}</div>`;
+    if(done&&a!==q.correcta)fb=`<div><b>${t("correctaEra")}:</b> ${t(q.correcta?"verdadero":"falso")}</div>`;
+  } else if(q.tipo==="huecos"){
+    const parts=x.enunciado.split(/_{3,}/);let h="";
+    parts.forEach((p,j)=>{h+=rich(p);if(j<parts.length-1){const v=(a||[])[j]||"";const cls=done&&r&&r.det?(r.det[j]?"ok":"bad"):"";
+      h+=`<input class="hole ${cls}" aria-label="${t("pregunta")} ${i+1}, ${j+1}" data-in="hole" data-q="${i}" data-h="${j}" value="${esc(v)}" ${done?"readonly":""} autocomplete="off" autocapitalize="off">`;}});
+    body=`<p class="huecos">${h}</p>`;
+    if(done&&r&&r.score<1)fb=`<div><b>${t("correctas")}:</b> ${x.respuestas.map(y=>rich(y.split("|")[0])).join(" · ")}</div>`;
+  } else {
+    body=`<p class="qtext">${rich(x.enunciado)}</p><textarea class="ans" rows="${q.tipo==="corta"?3:8}" aria-label="${t("tuRespuesta")}" placeholder="${t("tuRespuesta")}" data-in="resp" data-q="${i}" ${done?"readonly":""}>${esc(a||"")}</textarea>`;
+    if(done){fb=`<div><b>${t("modelo")}:</b><div class="model">${rich(x.respuesta_modelo||"—")}</div></div>${r&&r.comentario?`<div><b>${t("comentario")}${typeof r.nota==="number"?` (${fmtNota(r.nota)})`:""}:</b> ${rich(txtL(r.comentario))}</div>`:""}
+      ${r&&r.pend?`<div>${t("autoeval")}</div><div class="row"><button class="btn small" data-a="self" data-q="${i}" data-v="1">${t("ok")}</button><button class="btn small" data-a="self" data-q="${i}" data-v="0.5">${t("part")}</button><button class="btn small" data-a="self" data-q="${i}" data-v="0">${t("bad")}</button></div>`:""}`;}
+  }
+  if(done&&x.explicacion)fb+=`<div><b>${t("explicacion")}:</b> ${rich(x.explicacion)}</div>`;
+  return `<section class="card q" id="q${i}"><div class="qhead"><span class="qlab">${t("pregunta")} ${i+1} · ${t("t_"+q.tipo)}</span>${pill}</div>${body}${done&&fb?`<div class="fb ${e}">${fb}</div>`:""}</section>`;
+}
+function vInt(){
+  const tm=cur();const it=tm&&tm.intentos.find(x=>x.id===S.view.iid);if(!it){S.view={name:"tema",id:S.view.id,tab:"exam"};return vTema();}
+  const done=it.fase==="corregido",n=notaDe(it),p=pendientes(it);
+  const ok=it.preguntas.filter((q,i)=>it.res[i]&&it.res[i].score>=1).length;
+  const fails=it.preguntas.filter((q,i)=>it.res[i]&&typeof it.res[i].score==="number"&&it.res[i].score<1).length;
+  const cls=n==null?"pend":n>=5?"ok":"bad";
+  const head=`<div class="thead"><h1>${esc(txtL(it.titulo)||tm.titulo)}</h1><div class="meta"><span class="chip">${esc(t("o_"+(it.origen||"nuevo")))}</span><span class="chip">${it.preguntas.length} ${t("preguntas")}</span>${temaMeta(tm).replace(/^<div class="meta">|<\/div>$/g,"")}</div></div>`;
+  const score=done?`<section class="card"><div class="score"><span class="big ${cls}">${fmtNota(n)}</span><div><div class="flabel">${t("nota")}</div><div class="help">${t("aciertos",{a:ok,n:it.preguntas.length})}</div>${p?`<div class="help">${t("provisional")}</div>`:""}</div></div></section>`:"";
+  const corr=done&&p?`${pblock("p3",t("p3Title"),t("p3How"),p3(tm,it))}<section class="card"><label class="flabel" for="corrIn">${t("pegaCorr")}</label><textarea class="paste" id="corrIn" data-in="paste3">${esc(it.paste3||"")}</textarea>${S.err?`<p class="err">${esc(S.err)}</p>`:""}<div><button class="btn pri" data-a="apply3">${t("aplicar")}</button></div></section>`:"";
+  const sinR=it.preguntas.filter((q,i)=>{const a=it.resp[i];return a===undefined||a===""||(Array.isArray(a)&&!a.some(x=>x&&x.trim()));}).length;
+  const foot=done?`<div class="row">${fails?`<button class="btn pri" data-a="fails" data-id="${it.id}">${t("fallos")}</button>`:""}<button class="btn" data-a="repeat" data-id="${it.id}">${t("repetir")}</button><button class="btn" data-a="backTema">${t("volverTema")}</button></div>`
+    :`<section class="card">${sinR?`<p class="help" id="sinR">${t("sinResponder",{n:sinR})}</p>`:""}<button class="btn pri wide" data-a="grade">${t("corregir")}</button></section>`;
+  const lg=L2.filter(l=>it.preguntas.every(q=>q.L&&q.L[l]));
+  const exp=`<div class="row"><span class="flabel">${t("examenBlanco")}:</span><button class="btn small" data-a="exp" data-w="exam" data-f="pdf">PDF</button><button class="btn small" data-a="exp" data-w="exam" data-f="docx">Word</button></div>
+    ${lg.length===1&&!soloLang(tm)?`<p class="help">${t("soloUnoEx",{l:langIn(lg[0])})}</p>`:""}`;
+  return `${top("backTema")}${head}${exp}${score}${corr}${it.preguntas.map((q,i)=>qHtml(q,i,it)).join("")}${foot}`;
+}
+
+/* ---------- Render ---------- */
+const $app=document.getElementById("app");
+function render(){
+  document.documentElement.lang=S.ui;
+  needKatex=false;
+  const v=S.view.name;$app.innerHTML=v==="new"?vNew():v==="tema"?vTema():v==="int"?vInt():v==="perfiles"?vPerfiles():v==="asig"?vAsig():v==="arch"?vArch():vHome();
+  afterRender();
+}
+function afterRender(){if(needKatex&&!window.katex)loadScript(KATEX).then(()=>{const y=window.scrollY;render();window.scrollTo(0,y);}).catch(()=>{});}
+function go(view){S.view=view;S.err="";S.editNotes=false;S.confirmDel=false;render();window.scrollTo(0,0);}
+let toastT;function toast(m){const el=document.getElementById("toast");el.textContent=m;el.hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>el.hidden=true,2600);}
+function touch(tm){tm.mod=Date.now();save();}
+
+function copyText(txt,key){
+  const fallback=()=>{const d=document.getElementById("d-"+key),ta=document.getElementById("pt-"+key);
+    if(d&&ta){d.open=true;ta.focus();ta.select();let ok=false;try{ok=document.execCommand("copy");}catch(e){}toast(ok?t("copiado"):t("copiaManual"));}else toast(t("copiaManual"));};
+  try{navigator.clipboard.writeText(txt).then(()=>toast(t("copiado")),fallback);}catch(e){fallback();}
+}
+function dataURLtoBlob(d){const [h,b]=d.split(",");const bin=atob(b);const u=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)u[i]=bin.charCodeAt(i);return new Blob([u],{type:(h.match(/:(.*?);/)||[])[1]||"image/jpeg"});}
+function compress(file){return new Promise((res,rej)=>{const url=URL.createObjectURL(file),img=new Image();
+  img.onload=()=>{const M=1600;let w=img.naturalWidth,h=img.naturalHeight;const s=Math.min(1,M/Math.max(w,h));w=Math.round(w*s);h=Math.round(h*s);
+    const c=document.createElement("canvas");c.width=w;c.height=h;const x=c.getContext("2d");x.fillStyle="#fff";x.fillRect(0,0,w,h);x.drawImage(img,0,0,w,h);URL.revokeObjectURL(url);res(c.toDataURL("image/jpeg",0.82));};
+  img.onerror=()=>{URL.revokeObjectURL(url);rej(new Error("img"));};img.src=url;});}
+
+function newIntento(tm,preguntas,titulo,origen){
+  const it={id:uid(),creado:Date.now(),titulo,origen,preguntas:JSON.parse(JSON.stringify(preguntas)),resp:{},res:{},fase:"haciendo",paste3:""};
+  tm.intentos.push(it);touch(tm);go({name:"int",id:tm.id,iid:it.id});
+}
+
+/* ---------- Escáner: recorte automático y cámara en ráfaga ---------- */
+const mkC=(w,h)=>{const c=document.createElement("canvas");c.width=Math.max(1,w);c.height=Math.max(1,h);return c;};
+const loadImgEl=src=>new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=()=>rej(new Error("img"));i.src=src;});
+function scOtsu(G){const h=new Float64Array(256);for(let i=0;i<G.length;i++)h[G[i]]++;const n=G.length;let sum=0;for(let v=0;v<256;v++)sum+=v*h[v];
+  let sB=0,wB=0,best=0,th=128;for(let v=0;v<256;v++){wB+=h[v];if(!wB)continue;const wF=n-wB;if(!wF)break;sB+=v*h[v];const mB=sB/wB,mF=(sum-sB)/wF,b=wB*wF*(mB-mF)*(mB-mF);if(b>best){best=b;th=v;}}return th;}
+function scMorph(Mk,w,h,dil){const O=new Uint8Array(Mk.length);
+  for(let y=0;y<h;y++)for(let x=0;x<w;x++){let v=dil?0:1;
+    for(let dy=-1;dy<=1&&(dil?!v:v);dy++){const yy=y+dy;if(yy<0||yy>=h){if(!dil)v=0;continue;}
+      for(let dx=-1;dx<=1;dx++){const xx=x+dx,m=(xx<0||xx>=w)?0:Mk[yy*w+xx];if(dil&&m){v=1;break;}if(!dil&&!m){v=0;break;}}}
+    O[y*w+x]=v;}return O;}
+function scHull(p){p.sort((a,b)=>a.x-b.x||a.y-b.y);const cr=(o,a,b)=>(a.x-o.x)*(b.y-o.y)-(a.y-o.y)*(b.x-o.x);const lo=[],up=[];
+  for(const q of p){while(lo.length>=2&&cr(lo[lo.length-2],lo[lo.length-1],q)<=0)lo.pop();lo.push(q);}
+  for(let i=p.length-1;i>=0;i--){const q=p[i];while(up.length>=2&&cr(up[up.length-2],up[up.length-1],q)<=0)up.pop();up.push(q);}
+  return lo.slice(0,-1).concat(up.slice(0,-1));}
+function scOrder(pts){const mn=f=>pts.reduce((a,b)=>f(b)<f(a)?b:a),mx=f=>pts.reduce((a,b)=>f(b)>f(a)?b:a);
+  return [mn(p=>p.x+p.y),mn(p=>p.y-p.x),mx(p=>p.x+p.y),mx(p=>p.y-p.x)].map(p=>({x:p.x,y:p.y}));}
+/* Busca la hoja (zona clara y poco saturada más grande). Devuelve 4 esquinas o null */
+function scFind(src){
+  try{const iw=src.naturalWidth||src.videoWidth||src.width,ih=src.naturalHeight||src.videoHeight||src.height;if(!iw||!ih)return null;
+    const s=Math.min(1,300/Math.max(iw,ih)),w=Math.max(2,Math.round(iw*s)),h=Math.max(2,Math.round(ih*s));
+    const c=mkC(w,h),x=c.getContext("2d");x.drawImage(src,0,0,w,h);const D=x.getImageData(0,0,w,h).data,n=w*h,G=new Uint8Array(n);
+    for(let i=0,p=0;p<n;i+=4,p++){const r=D[i],g=D[i+1],b=D[i+2];G[p]=Math.max(0,.299*r+.587*g+.114*b-.5*(Math.max(r,g,b)-Math.min(r,g,b)));}
+    const th=scOtsu(G);let Mk=new Uint8Array(n);for(let p=0;p<n;p++)Mk[p]=G[p]>th?1:0;
+    Mk=scMorph(scMorph(Mk,w,h,false),w,h,true);Mk=scMorph(scMorph(Mk,w,h,true),w,h,false);
+    const lab=new Int32Array(n).fill(-1),q=new Int32Array(n);let bid=-1,bsz=0;
+    for(let p0=0;p0<n;p0++){if(!Mk[p0]||lab[p0]>=0)continue;let qh=0,qt=0;q[qt++]=p0;lab[p0]=p0;
+      while(qh<qt){const p=q[qh++],px=p%w,py=(p-px)/w;
+        if(px>0&&Mk[p-1]&&lab[p-1]<0){lab[p-1]=p0;q[qt++]=p-1;}if(px<w-1&&Mk[p+1]&&lab[p+1]<0){lab[p+1]=p0;q[qt++]=p+1;}
+        if(py>0&&Mk[p-w]&&lab[p-w]<0){lab[p-w]=p0;q[qt++]=p-w;}if(py<h-1&&Mk[p+w]&&lab[p+w]<0){lab[p+w]=p0;q[qt++]=p+w;}}
+      if(qt>bsz){bsz=qt;bid=p0;}}
+    if(bid<0||bsz<.12*n||bsz>.93*n)return null;
+    const pts=[];for(let y=0;y<h;y++){let l=-1,r=-1;for(let xx=0;xx<w;xx++)if(lab[y*w+xx]===bid){if(l<0)l=xx;r=xx;}
+      if(l>=0)pts.push({x:l,y},{x:r+1,y},{x:l,y:y+1},{x:r+1,y:y+1});}
+    const H=scHull(pts),ar=(a,b,c2)=>Math.abs((b.x-a.x)*(c2.y-a.y)-(b.y-a.y)*(c2.x-a.x));
+    while(H.length>4){let mi=0,mv=Infinity;for(let i=0;i<H.length;i++){const v=ar(H[(i-1+H.length)%H.length],H[i],H[(i+1)%H.length]);if(v<mv){mv=v;mi=i;}}H.splice(mi,1);}
+    if(H.length<4)return null;
+    return scOrder(H.map(p=>({x:Math.min(iw,Math.max(0,p.x/s)),y:Math.min(ih,Math.max(0,p.y/s))})));
+  }catch(e){return null;}
+}
+function scSolveH(src,dst){const A=[],b=[];
+  for(let i=0;i<4;i++){const {x,y}=src[i],u=dst[i].x,v=dst[i].y;A.push([x,y,1,0,0,0,-u*x,-u*y]);b.push(u);A.push([0,0,0,x,y,1,-v*x,-v*y]);b.push(v);}
+  for(let c=0;c<8;c++){let p=c;for(let r=c+1;r<8;r++)if(Math.abs(A[r][c])>Math.abs(A[p][c]))p=r;[A[c],A[p]]=[A[p],A[c]];[b[c],b[p]]=[b[p],b[c]];
+    const d=A[c][c];if(Math.abs(d)<1e-12)throw new Error("sing");
+    for(let r=0;r<8;r++){if(r===c)continue;const f=A[r][c]/d;if(!f)continue;for(let k=c;k<8;k++)A[r][k]-=f*A[c][k];b[r]-=f*b[c];}}
+  return b.map((v,i)=>v/A[i][i]);}
+function scWarp(sc,cr){
+  const [tl,tr,br,bl]=cr,d=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);let W=Math.max(d(tl,tr),d(bl,br)),H=Math.max(d(tl,bl),d(tr,br));
+  const k=Math.min(1,2000/Math.max(W,H));W=Math.max(8,Math.round(W*k));H=Math.max(8,Math.round(H*k));
+  const sw=sc.width,sh=sc.height,S2=sc.getContext("2d").getImageData(0,0,sw,sh).data;
+  const h=scSolveH([{x:0,y:0},{x:W,y:0},{x:W,y:H},{x:0,y:H}],[tl,tr,br,bl]);
+  const oc=mkC(W,H),ox=oc.getContext("2d"),od=ox.createImageData(W,H),O=od.data,mx=sw-1.001,my=sh-1.001,row=sw*4;let o=0;
+  for(let y=0;y<H;y++){const yy=y+.5;for(let x=0;x<W;x++){const xx=x+.5,den=h[6]*xx+h[7]*yy+1;
+    let X=(h[0]*xx+h[1]*yy+h[2])/den-.5,Y=(h[3]*xx+h[4]*yy+h[5])/den-.5;X=X<0?0:X>mx?mx:X;Y=Y<0?0:Y>my?my:Y;
+    const x0=X|0,y0=Y|0,fx=X-x0,fy=Y-y0,i=(y0*sw+x0)*4,j=i+row;
+    for(let ch=0;ch<3;ch++){const a=S2[i+ch]+(S2[i+4+ch]-S2[i+ch])*fx,c=S2[j+ch]+(S2[j+4+ch]-S2[j+ch])*fx;O[o+ch]=a+(c-a)*fy;}O[o+3]=255;o+=4;}}
+  ox.putImageData(od,0,0);return oc;}
+function scEnhance(c){/* aclara el papel y da contraste, canal a canal */
+  const x=c.getContext("2d"),id=x.getImageData(0,0,c.width,c.height),D=id.data,n=c.width*c.height;
+  for(let ch=0;ch<3;ch++){const h=new Uint32Array(256);for(let i=ch;i<D.length;i+=4)h[D[i]]++;
+    let acc=0,a=0,b=255;for(let v=0;v<256;v++){acc+=h[v];if(acc>=n*.005){a=v;break;}}acc=0;for(let v=255;v>=0;v--){acc+=h[v];if(acc>=n*.03){b=v;break;}}
+    if(b-a<30){a=Math.max(0,a-15);b=Math.min(255,b+15);}const L=new Uint8ClampedArray(256);for(let v=0;v<256;v++)L[v]=(v-a)*255/(b-a);
+    for(let i=ch;i<D.length;i+=4)D[i]=L[D[i]];}
+  x.putImageData(id,0,0);}
+/* Foto -> página recortada, enderezada y mejorada (JPEG en dataURL, como las demás fotos del tema) */
+async function autoScan(blob){
+  const url=URL.createObjectURL(blob);let img;try{img=await loadImgEl(url);}finally{URL.revokeObjectURL(url);}
+  const w=img.naturalWidth,h=img.naturalHeight,k=Math.min(1,2400/Math.max(w,h)),src=mkC(Math.round(w*k),Math.round(h*k)),sx=src.getContext("2d");
+  sx.fillStyle="#fff";sx.fillRect(0,0,src.width,src.height);sx.drawImage(img,0,0,src.width,src.height);
+  const cr=scFind(src);let out=src;if(cr){try{out=scWarp(src,cr);}catch(e){out=src;}}
+  scEnhance(out);
+  const k2=Math.min(1,1600/Math.max(out.width,out.height)),fin=mkC(Math.round(out.width*k2),Math.round(out.height*k2)),fx=fin.getContext("2d");
+  fx.imageSmoothingQuality="high";fx.drawImage(out,0,0,fin.width,fin.height);return fin.toDataURL("image/jpeg",.82);
+}
+const BU={stream:null,timer:null,queue:Promise.resolve(),pend:0,n:0,busy:false,tm:null,el:null};
+function buEl(){
+  if(BU.el)return BU.el;const d=document.createElement("div");d.id="burst";d.hidden=true;
+  d.innerHTML=`<div class="bstage"><video id="bVid" playsinline muted autoplay></video><canvas id="bOv"></canvas><div id="bFlash"></div></div>
+  <div class="bbar"><div class="bleft"><img id="bThumb" hidden alt=""><span id="bCount">0</span></div><button id="bShot" type="button"></button><button id="bDone" type="button"></button></div>`;
+  document.body.appendChild(d);BU.el=d;
+  d.querySelector("#bShot").addEventListener("click",buShot);d.querySelector("#bDone").addEventListener("click",buDone);
+  return d;}
+function buUI(){const c=document.getElementById("bCount");if(c)c.textContent=BU.n+(BU.pend?" …":"");}
+async function startBurst(tm){
+  if(!(navigator.mediaDevices&&navigator.mediaDevices.getUserMedia)){toast(t("camFail"));return;}
+  try{BU.stream=await navigator.mediaDevices.getUserMedia({audio:false,video:{facingMode:{ideal:"environment"},width:{ideal:3840},height:{ideal:2160}}});}
+  catch(e){toast(t("camFail"));return;}
+  const d=buEl();BU.tm=tm;BU.n=0;BU.pend=0;
+  d.querySelector("#bShot").setAttribute("aria-label",t("disparar"));d.querySelector("#bDone").textContent=t("hecho");
+  const th=d.querySelector("#bThumb");th.hidden=true;buUI();
+  const v=d.querySelector("#bVid");v.srcObject=BU.stream;d.hidden=false;document.body.style.overflow="hidden";try{await v.play();}catch(e){}
+  BU.timer=setInterval(buLive,450);
+}
+function buLive(){
+  const v=document.getElementById("bVid"),o=document.getElementById("bOv");if(!v||!o||!v.videoWidth)return;
+  const dpr=window.devicePixelRatio||1,W=o.clientWidth,H=o.clientHeight;if(o.width!==Math.round(W*dpr)){o.width=Math.round(W*dpr);o.height=Math.round(H*dpr);}
+  const s=Math.min(1,300/Math.max(v.videoWidth,v.videoHeight)),c=mkC(Math.round(v.videoWidth*s),Math.round(v.videoHeight*s));c.getContext("2d").drawImage(v,0,0,c.width,c.height);
+  const cr=scFind(c),x=o.getContext("2d");x.setTransform(dpr,0,0,dpr,0,0);x.clearRect(0,0,W,H);if(!cr)return;
+  const k=Math.min(W/c.width,H/c.height),ox=(W-c.width*k)/2,oy=(H-c.height*k)/2;
+  x.beginPath();cr.forEach((q,i)=>x[i?"lineTo":"moveTo"](ox+q.x*k,oy+q.y*k));x.closePath();
+  x.fillStyle="rgba(63,169,255,.18)";x.fill();x.lineWidth=3;x.strokeStyle="#3fa9ff";x.stroke();
+}
+async function buGrab(){
+  const tr=BU.stream.getVideoTracks()[0];
+  if("ImageCapture" in window){try{const ic=new ImageCapture(tr);return await Promise.race([ic.takePhoto(),new Promise((_,rej)=>setTimeout(()=>rej(new Error("t")),4000))]);}catch(e){}}
+  const v=document.getElementById("bVid"),c=mkC(v.videoWidth,v.videoHeight);c.getContext("2d").drawImage(v,0,0);
+  return await new Promise(r=>c.toBlob(r,"image/jpeg",.92));
+}
+async function buShot(){
+  if(!BU.stream||BU.busy)return;BU.busy=true;
+  const f=document.getElementById("bFlash");f.classList.remove("go");void f.offsetWidth;f.classList.add("go");
+  try{navigator.vibrate&&navigator.vibrate(30);}catch(e){}
+  try{const blob=await buGrab(),tm=BU.tm;BU.n++;BU.pend++;buUI();
+    BU.queue=BU.queue.then(async()=>{
+      try{const url=await autoScan(blob);const arr=S.imgs[tm.id]||(S.imgs[tm.id]=[]);arr.push(url);tm.nFotos=arr.length;saveImgs(tm.id);touch(tm);
+        const th=document.getElementById("bThumb");if(th){th.src=url;th.hidden=false;}}
+      catch(e){console.error(e);BU.n--;}
+      BU.pend--;buUI();});
+  }catch(e){toast(t("camFail"));}
+  finally{BU.busy=false;}
+}
+async function buDone(){
+  if(!BU.el||BU.el.hidden)return;
+  clearInterval(BU.timer);BU.timer=null;
+  if(BU.stream){BU.stream.getTracks().forEach(x=>x.stop());BU.stream=null;}
+  const v=document.getElementById("bVid");if(v)v.srcObject=null;
+  if(BU.pend){toast(t("procesando"));await BU.queue;}
+  BU.el.hidden=true;document.body.style.overflow="";
+  if(S.view.name==="tema")render();
+  if(BU.n)toast(t("nPag",{n:BU.n}));
+}
+document.addEventListener("visibilitychange",()=>{if(document.hidden&&BU.stream)buDone();});
+
+/* ---------- Acciones ---------- */
+document.addEventListener("click",e=>{
+  const b=e.target.closest("[data-a]");if(!b||b.tagName==="LABEL")return;
+  const a=b.dataset.a,tm=cur();
+  switch(a){
+    case "ui":S.ui=b.dataset.v;save();render();break;
+    case "home":go({name:"home"});break;
+    case "perfiles":S.editPerfil=null;S.confirmDelP=null;go({name:"perfiles"});break;
+    case "usePerfil":{S.perfil=b.dataset.id;S.cursoVer=null;S.q="";S.filtro="todos";save();go({name:"home"});break;}
+    case "editPerfil":S.editPerfil=b.dataset.id;S.confirmDelP=null;render();break;
+    case "cancelPerfil":S.editPerfil=null;S.confirmDelP=null;render();break;
+    case "askDelPerfil":S.confirmDelP=b.dataset.id;render();break;
+    case "noDelPerfil":S.confirmDelP=null;render();break;
+    case "delPerfil":{const id=b.dataset.id;S.temas.filter(x=>x.perfilId===id).forEach(x=>{DB.del("img:"+x.id);delete S.imgs[x.id];});
+      S.temas=S.temas.filter(x=>x.perfilId!==id);S.perfiles=S.perfiles.filter(p=>p.id!==id);if(S.perfil===id)S.perfil=null;S.editPerfil=null;S.confirmDelP=null;save();toast(t("borrado"));render();break;}
+    case "asig":S.q="";S.filtro="todos";go({name:"asig",k:b.dataset.k});break;
+    case "backAsig":{const x=cur()||null;const k=(S.nPre&&S.nPre.k)||(x&&asigKey(x))||S.view.k;if(x)S.cursoVer=x.curso;S.nPre=null;if(x&&x.archivado){go({name:"arch"});break;}go(k?{name:"asig",k}:{name:"home"});break;}
+    case "arch":go({name:"arch"});break;
+    case "unarch":{const x=S.temas.find(y=>y.id===b.dataset.id);if(x){x.archivado=false;touch(x);toast(t("recuperado"));render();}break;}
+    case "archTema":{tm.archivado=!tm.archivado;touch(tm);toast(t(tm.archivado?"archivado":"recuperado"));if(tm.archivado){const k=asigKey(tm);go({name:"asig",k});}else render();break;}
+    case "setEval":tm.eval=+b.dataset.v;touch(tm);render();break;
+    case "nEval":S.nEval=+b.dataset.v;document.querySelectorAll('[data-a="nEval"]').forEach(x=>x.setAttribute("aria-pressed",+x.dataset.v===S.nEval));break;
+    case "filtro":S.filtro=b.dataset.v;render();break;
+    case "newAsig":{S.nPre={k:S.view.k,curso:cursoVista()};S.nIdioma=S.ui;S.nModo="fotos";S.nEval=evalDefault();go({name:"new"});updTema();break;}
+    case "new":S.nPre=null;S.nIdioma=S.ui;S.nModo="fotos";S.nEval=evalDefault();go({name:"new"});updTema();break;
+    case "nModo":S.nModo=b.dataset.v;document.querySelectorAll('[data-a="nModo"]').forEach(x=>x.setAttribute("aria-pressed",x.dataset.v===S.nModo));break;
+    case "modo":tm.modo=b.dataset.v;touch(tm);render();break;
+    case "nIdioma":S.nIdioma=b.dataset.v;document.querySelectorAll('[data-a="nIdioma"]').forEach(x=>x.setAttribute("aria-pressed",x.dataset.v===S.nIdioma));break;
+    case "open":{const id=b.dataset.id;loadImgs(id).then(()=>{const x=S.temas.find(y=>y.id===id);go({name:"tema",id,tab:x&&hasNotes(x)?"notes":"scan"});});break;}
+    case "backTema":go({name:"tema",id:S.view.id,tab:"hist"});break;
+    case "tab":S.view.tab=b.dataset.v;S.err="";S.editNotes=false;S.confirmDel=false;render();window.scrollTo(0,0);break;
+    case "burst":startBurst(tm);break;
+    case "delImg":{const arr=S.imgs[tm.id];arr.splice(+b.dataset.i,1);tm.nFotos=arr.length;saveImgs(tm.id);touch(tm);render();break;}
+    case "share":{const imgs=S.imgs[tm.id]||[];try{const files=imgs.map((d,i)=>new File([dataURLtoBlob(d)],`apuntes-${i+1}.jpg`,{type:"image/jpeg"}));
+      if(!navigator.canShare||!navigator.canShare({files}))throw new Error("no");navigator.share({files}).catch(err=>{if(!err||err.name!=="AbortError")toast(t("shareFail"));});}catch(err){toast(t("shareFail"));}break;}
+    case "copy":{const k=b.dataset.k;let txt="";if(k==="p1")txt=p1(tm);else if(k==="p2")txt=p2(tm);else{const it=tm.intentos.find(x=>x.id===S.view.iid);txt=p3(tm,it);}copyText(txt,k);break;}
+    case "saveNotes":{const v=(tm.borrador||"").trim();if(!v)return;const bil=splitBil(v);tm.apuntesI=tm.apuntesI||{};
+      if(bil)Object.assign(tm.apuntesI,bil);else tm.apuntesI[S.editNotes?S.editLang:tm.idioma]=v;
+      tm.borrador="";S.editNotes=false;touch(tm);toast(t("guardado"));render();window.scrollTo(0,0);break;}
+    case "editNotes":{const n=notesOf(tm);S.editLang=n[S.ui]?S.ui:(n[tm.idioma]?tm.idioma:L2.find(l=>n[l]));tm.borrador=n[S.editLang]||"";S.editNotes=true;render();break;}
+    case "exp":exportar(tm,b.dataset.w,b.dataset.f);break;
+    case "cancelEdit":tm.borrador="";S.editNotes=false;render();break;
+    case "tipo":{const v=b.dataset.v,l=tm.cfg.tipos;const i=l.indexOf(v);if(i>=0)l.splice(i,1);else l.push(v);touch(tm);render();break;}
+    case "dif":tm.cfg.dif=b.dataset.v;touch(tm);render();break;
+    case "start":{let ex;try{ex=cleanExam(parseJSON(tm.examPaste));}catch(err){S.err=t("errJson");render();break;}
+      if(!ex.preguntas.length){S.err=t("errVacio");render();break;}
+      tm.examPaste="";newIntento(tm,ex.preguntas,ex.titulo||tm.titulo,"nuevo");break;}
+    case "openInt":if(b.dataset.iid)go({name:"int",id:b.dataset.id,iid:b.dataset.iid});else go({name:"int",id:tm.id,iid:b.dataset.id});break;
+    case "ans":{const it=tm.intentos.find(x=>x.id===S.view.iid);const q=it.preguntas[+b.dataset.q];const v=b.dataset.v;
+      it.resp[+b.dataset.q]=q.tipo==="vf"?v==="t":+v;touch(tm);
+      b.parentElement.querySelectorAll(".opt").forEach(o=>o.setAttribute("aria-pressed",o===b));updSinR(it);break;}
+    case "grade":{const it=tm.intentos.find(x=>x.id===S.view.iid);it.preguntas.forEach((q,i)=>{it.res[i]=grade(q,it.resp[i]);});it.fase="corregido";touch(tm);render();window.scrollTo(0,0);break;}
+    case "self":{const it=tm.intentos.find(x=>x.id===S.view.iid);const i=+b.dataset.q;it.res[i]={score:+b.dataset.v,self:true};touch(tm);const y=window.scrollY;render();window.scrollTo(0,y);break;}
+    case "apply3":{const it=tm.intentos.find(x=>x.id===S.view.iid);let o;try{o=parseJSON(it.paste3);}catch(err){S.err=t("errCorr");render();break;}
+      const list=o.correcciones||o.zuzenketak||o.corrections||[];let n=0;
+      (Array.isArray(list)?list:[]).forEach(c=>{const i=(+c.id||0)-1;const q=it.preguntas[i];if(!q||(q.tipo!=="corta"&&q.tipo!=="desarrollo"))return;
+        const nota=Math.max(0,Math.min(10,+String(c.nota).replace(",",".")||0));const cm=c.comentario;
+        it.res[i]={score:nota/10,nota,comentario:cm&&typeof cm==="object"?{es:String(cm.es||cm.eu||""),eu:String(cm.eu||cm.es||"")}:String(cm||""),ai:true};n++;});
+      if(!n){S.err=t("errCorr");render();break;}it.paste3="";S.err="";touch(tm);render();window.scrollTo(0,0);break;}
+    case "repeat":{const it=tm.intentos.find(x=>x.id===b.dataset.id);newIntento(tm,it.preguntas,it.titulo,"repetir");break;}
+    case "fails":{const it=tm.intentos.find(x=>x.id===b.dataset.id);const qs=it.preguntas.filter((q,i)=>it.res[i]&&typeof it.res[i].score==="number"&&it.res[i].score<1);if(qs.length)newIntento(tm,qs,it.titulo,"fallos");break;}
+    case "askDel":S.confirmDel=true;render();break;
+    case "noDel":S.confirmDel=false;render();break;
+    case "delTema":{const k=asigKey(tm),left=S.temas.some(x=>x.id!==tm.id&&x.perfilId===tm.perfilId&&asigKey(x)===k&&x.curso===tm.curso&&!x.archivado);S.temas=S.temas.filter(x=>x.id!==tm.id);DB.del("img:"+tm.id);delete S.imgs[tm.id];save();toast(t("borrado"));go(left?{name:"asig",k}:{name:"home"});break;}
+    case "bkSave":backupFile(false);break;
+    case "bkShare":backupFile(true);break;
+  }
+});
+function updSinR(it){const el=document.getElementById("sinR");if(!el)return;
+  const n=it.preguntas.filter((q,i)=>{const a=it.resp[i];return a===undefined||a===""||(Array.isArray(a)&&!a.some(x=>x&&x.trim()));}).length;
+  if(n)el.textContent=t("sinResponder",{n});else el.remove();}
+document.addEventListener("input",e=>{
+  const el=e.target,k=el.dataset&&el.dataset.in;if(!k)return;const tm=cur();
+  if(k==="q"){S.q=el.value;const pos=el.selectionStart;render();const n=document.getElementById("qBuscar");if(n){n.focus();try{n.setSelectionRange(pos,pos);}catch(e){}}return;}
+  if(!tm)return;
+  if(k==="borrador"||k==="examPaste"){tm[k]=el.value;save();return;}
+  const it=tm.intentos.find(x=>x.id===S.view.iid);if(!it)return;
+  if(k==="paste3"){it.paste3=el.value;save();return;}
+  const i=+el.dataset.q;
+  if(k==="resp")it.resp[i]=el.value;
+  if(k==="hole"){const arr=Array.isArray(it.resp[i])?it.resp[i]:[];arr[+el.dataset.h]=el.value;it.resp[i]=arr;}
+  save();updSinR(it);
+});
+document.addEventListener("change",async e=>{
+  const el=e.target;const tm=cur();
+  if(el.id==="bkFotos"){S.bkFotos=el.checked;return;}
+  if(el.dataset&&el.dataset.ch==="orden"){S.orden=el.value;save();render();return;}
+  if(el.dataset&&el.dataset.ch==="cursoVer"){S.cursoVer=el.value;S.q="";S.filtro="todos";if(S.view.name!=="home")go({name:"home"});else render();return;}
+  if(el.id==="tInno"&&tm){tm.innovamat=el.checked;S.prefInno=el.checked;touch(tm);render();return;}
+  if(el.matches&&el.matches("input[data-restore]")&&el.files&&el.files[0]){restoreFile(el.files[0]);el.value="";return;}
+  if(el.id==="nCurso"){document.getElementById("nMateria").innerHTML=matOptions(el.value);document.getElementById("otraWrap").hidden=true;updTema();return;}
+  if(el.id==="nMateria"){const w=document.getElementById("otraWrap");w.hidden=el.value!=="__otra";updTema();if(!w.hidden)document.getElementById("nOtra").focus();return;}
+  if(el.id==="nTema"){const c=CURR[document.getElementById("nCurso").value],k=(document.getElementById("nMateria").value||"").replace(/^k:/,""),ti=document.getElementById("nTitulo");
+    if(el.value!==""&&c&&c[k]){ti.value=c[k].temas[+el.value][S.ui==="eu"?1:0];}else{ti.value="";ti.focus();}return;}
+  if(el.dataset&&el.dataset.ch==="n"&&tm){tm.cfg.n=+el.value;touch(tm);render();return;}
+  if(el.matches&&el.matches("input[data-file]")&&tm&&el.files&&el.files.length){
+    toast(t("procesando"));const arr=S.imgs[tm.id]||(S.imgs[tm.id]=[]);
+    for(const f of Array.from(el.files)){try{arr.push(await autoScan(f));}catch(err){try{arr.push(await compress(f));}catch(e2){}}}
+    tm.nFotos=arr.length;saveImgs(tm.id);touch(tm);render();
+  }
+});
+document.addEventListener("submit",e=>{
+  if(e.target.id==="fPerfil"){e.preventDefault();const nombre=document.getElementById("pNombre").value.trim(),curso=document.getElementById("pCurso").value;if(!nombre)return;
+    if(S.editPerfil==="new"){const p={id:uid(),nombre,curso};S.perfiles.push(p);S.perfil=p.id;}else{const p=S.perfiles.find(x=>x.id===S.editPerfil);if(p){p.nombre=nombre;p.curso=curso;}}
+    S.editPerfil=null;S.cursoVer=null;save();if(S.view.name==="perfiles"&&S.perfiles.length===1)go({name:"home"});else render();return;}
+  if(e.target.id!=="fNew")return;e.preventDefault();
+  const titulo=document.getElementById("nTitulo").value.trim(),mv=document.getElementById("nMateria").value,msel=document.getElementById("nMateria").selectedOptions[0],matKey=mv.startsWith("k:")?mv.slice(2):"",materia=(mv==="__otra"?document.getElementById("nOtra").value:(msel&&msel.dataset.l)||mv).trim();
+  if(!titulo||!materia)return;
+  const ie=document.getElementById("nInno"),inno=!!(ie&&!document.getElementById("innoWrap").hidden&&ie.checked);if(ie&&!document.getElementById("innoWrap").hidden)S.prefInno=ie.checked;
+  const tm={id:uid(),perfilId:S.perfil,eval:S.nEval||evalDefault(),archivado:false,titulo,matKey,innovamat:inno,modo:S.nModo==="curr"?"curr":"fotos",curso:document.getElementById("nCurso").value,materia,idioma:S.nIdioma||S.ui,creado:Date.now(),mod:Date.now(),apuntesI:{},borrador:"",examPaste:"",cfg:defCfg(),intentos:[],nFotos:0};
+  S.temas.push(tm);S.imgs[tm.id]=[];S.cursoVer=tm.curso;S.nPre=null;save();saveImgs(tm.id);go({name:"tema",id:tm.id,tab:"scan"});
+});
+const pendBk=()=>S.temas.some(x=>!x.ejemplo&&(x.mod||0)>(S.lastBackup||0));
+const canShareFiles=()=>{try{return !!(navigator.canShare&&navigator.canShare({files:[new File(["x"],"x.json",{type:"application/json"})]}));}catch(e){return false;}};
+async function buildBackup(){
+  const o={ikasi:3,creado:Date.now(),perfiles:S.perfiles,temas:S.temas.filter(x=>!x.ejemplo)};
+  if(S.bkFotos){o.imgs={};for(const x of o.temas){await loadImgs(x.id);if((S.imgs[x.id]||[]).length)o.imgs[x.id]=S.imgs[x.id];}}
+  return new Blob([JSON.stringify(o)],{type:"application/json"});
+}
+async function backupFile(share){
+  toast(t("preparando"));
+  try{
+    const blob=await buildBackup(),d=new Date(),name=`ikasi-copia-${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}.json`;
+    let ok=false;
+    if(share){const f=new File([blob],name,{type:"application/json"});try{await navigator.share({files:[f],title:name});ok=true;}catch(e){if(e&&e.name==="AbortError")return;toast(t("shareFail"));return;}}
+    else{const r=await saveFile(name,blob);if(r==="blocked"){toast(t("noDescarga"));return;}ok=r==="ok";}
+    if(ok){S.lastBackup=Date.now();save();toast(t("bkOk"));if(S.view.name==="home")render();}
+  }catch(e){console.error(e);toast(t("exportFail"));}
+}
+function restoreFile(file){
+  const fr=new FileReader();
+  fr.onload=()=>{try{const o=JSON.parse(fr.result);if(!o||!o.ikasi||!Array.isArray(o.temas))throw 0;let n=0;
+      (Array.isArray(o.perfiles)?o.perfiles:[]).forEach(p=>{if(p&&p.id&&!S.perfiles.some(x=>x.id===p.id))S.perfiles.push({id:p.id,nombre:String(p.nombre||"?"),curso:p.curso||"dbh1"});});
+      o.temas.forEach(x=>{if(!x||!x.id)return;const i=S.temas.findIndex(y=>y.id===x.id);migrate(x);if(i>=0)S.temas[i]=x;else S.temas.push(x);n++;
+        if(o.imgs&&Array.isArray(o.imgs[x.id])){S.imgs[x.id]=o.imgs[x.id];x.nFotos=o.imgs[x.id].length;saveImgs(x.id);}});
+      fixPerfiles();if(!S.perfil&&S.perfiles.length)S.perfil=S.perfiles[0].id;save();toast(t("bkRest",{n}));render();}catch(e){toast(t("errRestore"));}};
+  fr.onerror=()=>toast(t("errRestore"));fr.readAsText(file);
+}
+const innoEligible=(curso,key,name)=>/^lh/.test(curso||"")&&(key==="mat"||/^matemat/.test(norm(name||"")));
+const usesInno=tm=>!!tm.innovamat&&innoEligible(tm.curso,tm.matKey,tm.materia);
+function updInno(){const w=document.getElementById("innoWrap");if(!w)return;const v=document.getElementById("nMateria").value||"";
+  w.hidden=!innoEligible(document.getElementById("nCurso").value,v.replace(/^k:/,""),v);}
+function updTema(){const w=document.getElementById("temaWrap");if(!w)return;
+  const curso=document.getElementById("nCurso").value,k=(document.getElementById("nMateria").value||"").replace(/^k:/,"");
+  const h=temaOptions(curso,k);w.hidden=!h;document.getElementById("nTema").innerHTML=h;updInno();}
+function defCfg(){return{tipos:["test","vf","huecos","corta"],n:10,dif:"media"};}
+
+/* ---------- Exportar a PDF y Word ---------- */
+const LIB={pdf:"https://cdn.jsdelivr.net/npm/pdfmake@0.2.10/build/pdfmake.min.js",vfs:"https://cdn.jsdelivr.net/npm/pdfmake@0.2.10/build/vfs_fonts.js",docx:"https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.umd.js"};
+const loaded={};
+function loadScript(src){return loaded[src]||(loaded[src]=new Promise((res,rej)=>{const s=document.createElement("script");s.src=src;s.onload=res;s.onerror=()=>{delete loaded[src];rej(new Error("lib"));};document.head.appendChild(s);}));}
+const inViewer=!!(window.claude&&window.claude.use);
+const dlCap=inViewer?Promise.resolve(window.claude.use("downloads")).catch(()=>null):Promise.resolve(null);
+const slug=s=>norm(s).replace(/[^a-z0-9]+/g,"-").replace(/^-+|-+$/g,"").slice(0,60)||"ikasi";
+const R=s=>inlineRuns(s).map(r=>r.math?{t:texText(r.t),i:true}:r);
+function modelBlocks(bs){
+  return bs.map(b=>{
+    if(b.k==="ul"||b.k==="ol")return {k:b.k,items:b.items.map(R)};
+    if(b.k==="q")return {k:"q",children:modelBlocks(b.children)};
+    if(b.k==="callout")return {k:"callout",kind:calloutKind(b.kind),title:R(calloutTitle(b)),children:modelBlocks(b.children)};
+    if(b.k==="table")return {k:"table",head:b.head?b.head.map(R):null,rows:b.rows.map(r=>r.map(R))};
+    if(b.k==="math")return {k:"math",t:texText(b.t)};
+    if(b.k==="svg")return {k:"svg",code:svgData(b.code)};
+    if(b.k==="code")return {k:"code",t:b.t};
+    if(b.k==="hr")return {k:"hr"};
+    if(b.k==="p"&&b.lines){const rs=[];b.lines.forEach((l,i)=>{if(i)rs.push({t:"\n",br:true});rs.push(...R(l));});return {k:"p",runs:rs};}
+    return {k:b.k,lv:b.lv,runs:R(b.t)};
+  });
+}
+function modelNotes(tm){
+  const bs=blocks(notesFor(tm));const first=bs[0]&&bs[0].k==="h"&&bs[0].lv===1?bs.shift():null;
+  return [{k:"title",t:first?texText(first.t.replace(/\*\*/g,"")):tm.titulo},{k:"meta",t:`${cursoLbl(tm.curso)} · ${tm.materia}`},...modelBlocks(bs)];
+}
+function modelExam(tm,it){
+  const out=[{k:"title",t:txtL(it.titulo)||tm.titulo},{k:"meta",t:`${cursoLbl(tm.curso)} · ${tm.materia}`},
+    {k:"p",runs:[{t:`${t("nombre")}: ______________________________     ${t("fechaL")}: ____________`}]},{k:"hr"}];
+  it.preguntas.forEach((q,i)=>{const x=qt(q);
+    const en=q.tipo==="huecos"?x.enunciado.replace(/_{3,}/g,"______________"):x.enunciado;
+    out.push({k:"qh",runs:[{t:`${i+1}. `,b:true},...R(en).map(r=>Object.assign({},r,{b:true}))],tag:t("t_"+q.tipo)});
+    if(q.tipo==="test")x.opciones.forEach((o,j)=>out.push({k:"opt",runs:[{t:`[   ]  ${"abcdef"[j]||j+1}) `},...R(o)]}));
+    else if(q.tipo==="vf")out.push({k:"opt",runs:[{t:`[   ]  ${t("verdadero")}          [   ]  ${t("falso")}`}]});
+    else if(q.tipo==="corta")out.push({k:"lines",n:3});
+    else if(q.tipo==="desarrollo")out.push({k:"lines",n:9});
+  });
+  return out;
+}
+const CFILL={formula:["#E5EBFA","#2348B8"],ejemplo:["#E2F2E9","#1B7F52"],error:["#FAE4E7","#C42339"],importante:["#FAEFD6","#A16400"],nota:["#ECEFF5","#596379"]};
+function svgOk(code){try{if(typeof DOMParser==="undefined")return true;const d=new DOMParser().parseFromString(code,"image/svg+xml");return !d.getElementsByTagName("parsererror").length&&d.documentElement.nodeName.toLowerCase()==="svg";}catch(e){return false;}}
+async function toPdf(model){
+  await loadScript(LIB.pdf);await loadScript(LIB.vfs);
+  const pr=rs=>rs.map(r=>{const o={text:String(r.t).replace(/\u20D7/g,"")};if(r.b)o.bold=true;if(r.i)o.italics=true;if(r.del){o.decoration="lineThrough";o.color="#7A8294";}if(r.fix)o.color="#C42339";if(r.mark)o.background="#EDF26B";return o;});
+  const line=top=>({canvas:[{type:"line",x1:0,y1:0,x2:515,y2:0,lineWidth:.6,lineColor:"#B9C0CE"}],margin:[0,top,0,0]});
+  const thin={hLineWidth:()=>.6,vLineWidth:()=>.6,hLineColor:()=>"#C9CFDB",vLineColor:()=>"#C9CFDB",paddingLeft:()=>6,paddingRight:()=>6,paddingTop:()=>4,paddingBottom:()=>4};
+  const conv=items=>{const c=[];items.forEach(b=>{
+    if(b.k==="title")c.push({text:b.t,style:"title"});
+    else if(b.k==="meta")c.push({text:b.t,style:"meta"});
+    else if(b.k==="h")c.push({text:pr(b.runs),style:"h"+b.lv});
+    else if(b.k==="p")c.push({text:pr(b.runs),margin:[0,2,0,6]});
+    else if(b.k==="q")c.push({stack:conv(b.children),italics:true,color:"#596379",margin:[12,2,0,6]});
+    else if(b.k==="ul")c.push({ul:b.items.map(x=>({text:pr(x)})),margin:[0,2,0,6]});
+    else if(b.k==="ol")c.push({ol:b.items.map(x=>({text:pr(x)})),margin:[0,2,0,6]});
+    else if(b.k==="hr")c.push(line(8),{text:"",margin:[0,0,0,6]});
+    else if(b.k==="math")c.push({text:String(b.t).replace(/\u20D7/g,""),italics:true,alignment:"center",fontSize:12,margin:[0,6,0,8]});
+    else if(b.k==="code")c.push({text:b.t,fontSize:9,preserveLeadingSpaces:true,color:"#333333",margin:[0,4,0,8]});
+    else if(b.k==="table"){const n=Math.max(...[b.head||[],...b.rows].map(r=>r.length),1);const fill=r=>{const a=r.map(x=>({text:pr(x)}));while(a.length<n)a.push({text:""});return a;};
+      const body=[];if(b.head)body.push(fill(b.head).map(x=>Object.assign(x,{bold:true,fillColor:"#ECEFF5"})));b.rows.forEach(r=>body.push(fill(r)));
+      c.push({table:{headerRows:b.head?1:0,widths:Array(n).fill("*"),body},layout:thin,fontSize:10,margin:[0,4,0,10]});}
+    else if(b.k==="callout"){const f=CFILL[b.kind]||CFILL.nota;
+      c.push({table:{widths:["*"],body:[[{stack:[{text:pr(b.title),bold:true,color:f[1],fontSize:9.5,margin:[0,0,0,4]},...conv(b.children)],fillColor:f[0]}]]},
+        layout:{hLineWidth:()=>1,vLineWidth:()=>1,hLineColor:()=>f[1],vLineColor:()=>f[1],paddingLeft:()=>10,paddingRight:()=>10,paddingTop:()=>8,paddingBottom:()=>6},margin:[0,6,0,10]});}
+    else if(b.k==="svg"){if(svgOk(b.code))c.push({svg:b.code,width:400,alignment:"center",margin:[0,6,0,6]});}
+    else if(b.k==="qh")c.push({text:[...pr(b.runs),{text:"   ("+b.tag+")",fontSize:9,color:"#596379",bold:false}],margin:[0,14,0,6],fontSize:12});
+    else if(b.k==="opt")c.push({text:pr(b.runs),margin:[14,3,0,3]});
+    else if(b.k==="lines")for(let i=0;i<b.n;i++)c.push(line(i?20:22));
+  });return c;};
+  const dd={pageSize:"A4",pageMargins:[40,48,40,48],content:conv(model),defaultStyle:{fontSize:11,lineHeight:1.25},
+    styles:{title:{fontSize:20,bold:true,margin:[0,0,0,2]},meta:{fontSize:10,color:"#596379",margin:[0,0,0,12]},h1:{fontSize:16,bold:true,margin:[0,12,0,4]},h2:{fontSize:14,bold:true,margin:[0,10,0,4]},h3:{fontSize:12,bold:true,margin:[0,8,0,2]},h4:{fontSize:11,bold:true,margin:[0,6,0,2]}}};
+  return new Promise((res,rej)=>{try{window.pdfMake.createPdf(dd).getBlob(res);}catch(e){rej(e);}});
+}
+function svgToPng(code){return new Promise(res=>{try{
+  const img=new Image();img.onload=()=>{try{const W=Math.min(1200,(img.naturalWidth||600)*2),H=Math.round(W*((img.naturalHeight||400)/(img.naturalWidth||600)));
+    const cv=document.createElement("canvas");cv.width=W;cv.height=H;const x=cv.getContext("2d");x.fillStyle="#fff";x.fillRect(0,0,W,H);x.drawImage(img,0,0,W,H);
+    cv.toBlob(b=>{if(!b)return res(null);b.arrayBuffer().then(buf=>res({data:new Uint8Array(buf),w:W,h:H}));},"image/png");}catch(e){res(null);}};
+  img.onerror=()=>res(null);img.src="data:image/svg+xml;charset=utf-8,"+encodeURIComponent(code);}catch(e){res(null);}});}
+async function toDocx(model){
+  await loadScript(LIB.docx);const D=window.docx;
+  const pngs=new Map();const walk=items=>items.forEach(b=>{if(b.k==="svg")pngs.set(b,null);if(b.children)walk(b.children);});walk(model);
+  for(const b of pngs.keys())pngs.set(b,await svgToPng(b.code));
+  const tr=(rs,ex)=>rs.map(r=>r.br?new D.TextRun({text:"",break:1}):new D.TextRun(Object.assign({text:r.t,bold:!!r.b,italics:!!r.i,strike:!!r.del},r.fix?{color:"C42339"}:r.del?{color:"7A8294"}:{},r.mark?{highlight:"yellow"}:{},ex||{})));
+  const H=[D.HeadingLevel.HEADING_1,D.HeadingLevel.HEADING_2,D.HeadingLevel.HEADING_3,D.HeadingLevel.HEADING_4];
+  const rule=before=>new D.Paragraph({spacing:{before},border:{bottom:{color:"999999",space:1,style:D.BorderStyle.SINGLE,size:6}},children:[]});
+  const bd=c=>({top:{style:D.BorderStyle.SINGLE,size:6,color:c},bottom:{style:D.BorderStyle.SINGLE,size:6,color:c},left:{style:D.BorderStyle.SINGLE,size:6,color:c},right:{style:D.BorderStyle.SINGLE,size:6,color:c}});
+  let olN=0;
+  const conv=items=>{const ch=[];items.forEach(b=>{
+    if(b.k==="title")ch.push(new D.Paragraph({heading:D.HeadingLevel.TITLE,children:[new D.TextRun(b.t)]}));
+    else if(b.k==="meta")ch.push(new D.Paragraph({spacing:{after:200},children:[new D.TextRun({text:b.t,color:"596379",size:20})]}));
+    else if(b.k==="h")ch.push(new D.Paragraph({heading:H[b.lv-1]||H[3],children:tr(b.runs)}));
+    else if(b.k==="p")ch.push(new D.Paragraph({spacing:{after:120},children:tr(b.runs)}));
+    else if(b.k==="q")conv(b.children).forEach(x=>ch.push(x));
+    else if(b.k==="ul")b.items.forEach(it=>ch.push(new D.Paragraph({bullet:{level:0},children:tr(it)})));
+    else if(b.k==="ol"){olN++;b.items.forEach(it=>ch.push(new D.Paragraph({numbering:{reference:"num",level:0,instance:olN},children:tr(it)})));}
+    else if(b.k==="hr")ch.push(rule(120));
+    else if(b.k==="math")ch.push(new D.Paragraph({alignment:D.AlignmentType.CENTER,spacing:{before:120,after:120},children:[new D.TextRun({text:b.t,italics:true,size:24})]}));
+    else if(b.k==="code")b.t.split("\n").forEach(l=>ch.push(new D.Paragraph({children:[new D.TextRun({text:l,font:"Consolas",size:18})]})));
+    else if(b.k==="table"){const n=Math.max(...[b.head||[],...b.rows].map(r=>r.length),1);
+      const mk=(r,head)=>new D.TableRow({tableHeader:!!head,children:Array.from({length:n},(_,j)=>new D.TableCell({shading:head?{fill:"ECEFF5"}:undefined,margins:{top:60,bottom:60,left:100,right:100},children:[new D.Paragraph({children:tr(r[j]||[],head?{bold:true}:null)})]}))});
+      const rows=[];if(b.head)rows.push(mk(b.head,true));b.rows.forEach(r=>rows.push(mk(r,false)));
+      ch.push(new D.Table({rows,width:{size:100,type:D.WidthType.PERCENTAGE}}));ch.push(new D.Paragraph({children:[]}));}
+    else if(b.k==="callout"){const f=CFILL[b.kind]||CFILL.nota;
+      ch.push(new D.Table({width:{size:100,type:D.WidthType.PERCENTAGE},rows:[new D.TableRow({children:[new D.TableCell({shading:{fill:f[0].slice(1)},borders:bd(f[1].slice(1)),margins:{top:120,bottom:120,left:160,right:160},
+        children:[new D.Paragraph({spacing:{after:80},children:tr(b.title,{bold:true,color:f[1].slice(1),size:18,allCaps:true})}),...conv(b.children)]})]})]}));
+      ch.push(new D.Paragraph({children:[]}));}
+    else if(b.k==="svg"){const p=pngs.get(b);if(p){const w=Math.min(450,p.w/2),h=Math.round(w*p.h/p.w);ch.push(new D.Paragraph({alignment:D.AlignmentType.CENTER,children:[new D.ImageRun({data:p.data,transformation:{width:w,height:h}})]}));}}
+    else if(b.k==="qh")ch.push(new D.Paragraph({spacing:{before:280,after:100},children:[...tr(b.runs),new D.TextRun({text:"   ("+b.tag+")",color:"596379",size:18})]}));
+    else if(b.k==="opt")ch.push(new D.Paragraph({indent:{left:360},spacing:{after:60},children:tr(b.runs)}));
+    else if(b.k==="lines")for(let i=0;i<b.n;i++)ch.push(rule(320));
+  });return ch;};
+  const doc=new D.Document({
+    styles:{default:{document:{run:{font:"Calibri",size:22}}}},
+    numbering:{config:[{reference:"num",levels:[{level:0,format:D.LevelFormat.DECIMAL,text:"%1.",alignment:D.AlignmentType.START,style:{paragraph:{indent:{left:720,hanging:360}}}}]}]},
+    sections:[{properties:{},children:conv(model)}]});
+  return D.Packer.toBlob(doc);
+}
+async function saveFile(filename,blob){
+  const d=await dlCap;
+  if(d){try{await d.save({filename,data:blob});return "ok";}
+    catch(e){const c=e&&e.code;if(c==="declined"||c==="rate_limited")return "no";if(!["unavailable","not_granted","capability_disabled","capability_removed"].includes(c))throw e;}}
+  if(inViewer)return "blocked";
+  const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download=filename;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),5000);return "ok";
+}
+let exporting=false;
+async function exportar(tm,w,f){
+  if(exporting)return;exporting=true;toast(t("preparando"));
+  try{
+    let model,base;
+    if(w==="notes"){model=modelNotes(tm);base=`${tm.titulo}-${t("apuntesDe")}`;}
+    else{const it=tm.intentos.find(x=>x.id===S.view.iid);model=modelExam(tm,it);base=`${tm.titulo}-${t("s_exam")}`;}
+    const blob=f==="pdf"?await toPdf(model):await toDocx(model);
+    const r=await saveFile(`${slug(base)}-${S.ui}.${f}`,blob);
+    if(r==="ok")toast(t("descargado"));else if(r==="blocked")toast(t("noDescarga"));
+  }catch(e){console.error(e);toast(t("exportFail"));}
+  finally{exporting=false;}
+}
+
+/* ---------- Ejemplo inicial ---------- */
+function seed(){
+  const ap=`# La célula
+
+## Teoría celular
+- Todos los seres vivos están formados por una o más células.
+- La célula es la unidad ~~mas pequeña~~ **más pequeña** con vida propia.
+- ==Toda célula procede de otra célula ya existente (Virchow, 1855).==
+
+## Tipos de células
+### Procariotas
+- No tienen núcleo: el ADN está libre en el citoplasma.
+- Ejemplo: las bacterias.
+
+### Eucariotas
+- Tienen núcleo, rodeado por una membrana ~~simple~~ **doble** (envoltura nuclear).
+- Pueden ser animales o vegetales.
+
+## Célula animal y célula vegetal
+- La célula vegetal tiene **pared celular** de celulosa y **cloroplastos**.
+- ==La vegetal suele tener una vacuola grande; la animal, varias pequeñas.==
+- La célula animal tiene centriolos.
+
+## Resumen
+- Todos los seres vivos están formados por células.
+- Las procariotas no tienen núcleo; las eucariotas sí.
+- Solo la célula vegetal tiene pared celular y cloroplastos.
+
+## Vocabulario
+- **Orgánulo**: estructura de la célula con una función concreta.
+- **Cloroplasto**: orgánulo donde se hace la fotosíntesis.
+- **Mitocondria**: orgánulo donde se obtiene energía (respiración celular).`;
+  const apEu=`# Zelula
+
+## Zelula-teoria
+- Izaki bizidun guztiak zelula batez edo gehiagoz osatuta daude.
+- Zelula bizitza propioa duen unitate ~~txikiña~~ **txikiena** da.
+- ==Zelula oro lehendik dagoen beste zelula batetik dator (Virchow, 1855).==
+
+## Zelula motak
+### Prokariotoak
+- Ez dute nukleorik: DNA zitoplasman aske dago.
+- Adibidea: bakterioak.
+
+### Eukariotoak
+- Nukleoa dute, mintz ~~bakun~~ **bikoitz** batez inguratuta (nukleo-mintza).
+- Animalia-zelulak edo landare-zelulak izan daitezke.
+
+## Animalia-zelula eta landare-zelula
+- Landare-zelulak zelulosazko **zelula-horma** eta **kloroplastoak** ditu.
+- ==Landare-zelulak bakuolo handi bat izan ohi du; animalia-zelulak, txiki batzuk.==
+- Animalia-zelulak zentrioloak ditu.
+
+## Laburpena
+- Izaki bizidun guztiak zelulez osatuta daude.
+- Prokariotoek ez dute nukleorik; eukariotoek bai.
+- Landare-zelulak bakarrik ditu zelula-horma eta kloroplastoak.
+
+## Hiztegia
+- **Organulua**: funtzio jakin bat duen zelularen egitura.
+- **Kloroplastoa**: fotosintesia egiten den organulua.
+- **Mitokondria**: energia lortzen den organulua (arnasketa zelularra).`;
+  const qs=[
+    {tipo:"test",correcta:1,L:{
+      es:{enunciado:"¿Qué tienen las células eucariotas que no tienen las procariotas?",opciones:["Membrana plasmática","Núcleo","Citoplasma","Ribosomas"],explicacion:"Las procariotas tienen el ADN libre en el citoplasma; las eucariotas lo guardan en el núcleo."},
+      eu:{enunciado:"Zer dute zelula eukariotoek prokariotoek ez dutena?",opciones:["Mintz plasmatikoa","Nukleoa","Zitoplasma","Erribosomak"],explicacion:"Prokariotoek DNA zitoplasman aske dute; eukariotoek nukleoan gordetzen dute."}}},
+    {tipo:"vf",correcta:false,L:{
+      es:{enunciado:"Las bacterias son células eucariotas.",explicacion:"Las bacterias son procariotas: no tienen núcleo."},
+      eu:{enunciado:"Bakterioak zelula eukariotoak dira.",explicacion:"Bakterioak prokariotoak dira: ez dute nukleorik."}}},
+    {tipo:"huecos",L:{
+      es:{enunciado:"La fotosíntesis se realiza en los ___.",respuestas:["cloroplastos|cloroplasto"],explicacion:"Los cloroplastos solo están en las células vegetales."},
+      eu:{enunciado:"Fotosintesia ___ egiten da.",respuestas:["kloroplastoetan|kloroplastoan"],explicacion:"Kloroplastoak landare-zeluletan bakarrik daude."}}},
+    {tipo:"test",correcta:1,L:{
+      es:{enunciado:"¿Quién afirmó que toda célula procede de otra célula?",opciones:["Robert Hooke","Rudolf Virchow","Charles Darwin","Gregor Mendel"],explicacion:"Virchow lo propuso en 1855 y completó la teoría celular."},
+      eu:{enunciado:"Nork baieztatu zuen zelula oro beste zelula batetik datorrela?",opciones:["Robert Hooke","Rudolf Virchow","Charles Darwin","Gregor Mendel"],explicacion:"Virchowek 1855ean proposatu zuen, eta zelula-teoria osatu zuen."}}},
+    {tipo:"corta",L:{
+      es:{enunciado:"Nombra dos diferencias entre la célula animal y la vegetal.",respuesta_modelo:"La vegetal tiene pared celular y cloroplastos; además suele tener una vacuola grande. La animal tiene centriolos y varias vacuolas pequeñas.",criterios:"Dos diferencias correctas.",explicacion:""},
+      eu:{enunciado:"Esan animalia-zelularen eta landare-zelularen arteko bi desberdintasun.",respuesta_modelo:"Landare-zelulak zelula-horma eta kloroplastoak ditu, eta bakuolo handi bat izan ohi du. Animalia-zelulak zentrioloak eta bakuolo txiki batzuk ditu.",criterios:"Bi desberdintasun zuzen.",explicacion:""}}},
+    {tipo:"vf",correcta:true,L:{
+      es:{enunciado:"La envoltura nuclear es una membrana doble.",explicacion:"El núcleo está rodeado por dos membranas."},
+      eu:{enunciado:"Nukleo-mintza mintz bikoitza da.",explicacion:"Nukleoa bi mintzez inguratuta dago."}}}];
+  const ts=Date.now()-86400000;
+  const it={id:uid(),creado:ts,titulo:{es:"La célula",eu:"Zelula"},origen:"nuevo",preguntas:qs,
+    resp:{0:1,1:false,2:["mitocondrias"],3:0,4:"La vegetal tiene cloroplastos y pared celular.",5:true},
+    res:{0:{score:1},1:{score:1},2:{score:0,det:[false]},3:{score:0},4:{score:.8,nota:8,comentario:{es:"Bien: las dos diferencias son correctas. Podrías añadir la vacuola.",eu:"Ondo: bi desberdintasunak zuzenak dira. Bakuoloa ere aipa zenezake."},ai:true},5:{score:1}},
+    fase:"corregido",paste3:""};
+  return {id:"ejemplo-celula",ejemplo:true,seedV:3,titulo:"La célula",curso:"dbh1",materia:"Ciencias de la Naturaleza",matKey:"cn",eval:1,idioma:"es",creado:ts,mod:ts,apuntesI:{es:ap,eu:apEu},borrador:"",examPaste:"",cfg:defCfg(),intentos:[it],nFotos:0};
+}
+function fixPerfiles(){const ids=new Set(S.perfiles.map(p=>p.id));const def=(S.perfiles.find(p=>p.id===S.perfil)||S.perfiles[0]||{}).id;S.temas.forEach(x=>{if(!ids.has(x.perfilId))x.perfilId=def;});}
+function migrate(x){
+  x.intentos=x.intentos||[];x.cfg=x.cfg||defCfg();
+  if(!x.apuntesI){x.apuntesI={};if(x.apuntes)x.apuntesI[x.idioma||"es"]=x.apuntes;}
+  delete x.apuntes;return x;
+}
+
+/* ---------- Arranque ---------- */
+(async function boot(){
+  S.storageOk=await DB.open();
+  try{if(navigator.storage&&navigator.storage.persist){S.persist=(await navigator.storage.persisted())||(await navigator.storage.persist());}}catch(e){}
+  const st=S.storageOk?await DB.get("state"):null;
+  if(st&&Array.isArray(st.temas)){S.temas=st.temas;if(st.ui)S.ui=st.ui;S.lastBackup=st.lastBackup||0;if(st.prefInno!==undefined)S.prefInno=st.prefInno;S.perfiles=Array.isArray(st.perfiles)?st.perfiles:[];S.perfil=st.perfil||null;S.orden=st.orden||"recientes";}
+  else{S.temas=[seed()];save();}
+  S.temas=S.temas.map(x=>x.id==="ejemplo-celula"&&x.seedV!==3?Object.assign(seed(),{perfilId:x.perfilId}):migrate(x));
+  S.perfiles=S.perfiles||[];
+  if(!S.perfiles.length){const cs={};S.temas.filter(x=>!x.ejemplo).forEach(x=>cs[x.curso]=(cs[x.curso]||0)+1);const best=Object.keys(cs).sort((a,b)=>cs[b]-cs[a])[0]||"dbh1";
+    S.perfiles=[{id:uid(),nombre:S.ui==="eu"?"Ikaslea":"Estudiante",curso:best}];}
+  fixPerfiles();
+  if(!S.perfiles.some(p=>p.id===S.perfil))S.perfil=S.perfiles.length===1?S.perfiles[0].id:null;
+  save();
+  render();
+})();
+})();
+</script>
+
+</body>
+</html>
