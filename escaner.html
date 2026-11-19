@@ -48,6 +48,22 @@ h2{font-size:15px;color:var(--mut);margin:22px 2px 10px;text-transform:uppercase
 .pbtns button+button{border-left:1px solid var(--line)}
 .actions{position:fixed;left:0;right:0;bottom:0;z-index:15;display:flex;gap:8px;padding:10px 12px calc(10px + env(safe-area-inset-bottom));background:rgba(244,246,249,.96);border-top:1px solid var(--line);justify-content:center}
 .actions .btn{flex:1;max-width:220px;padding:12px 4px;font-size:14px;white-space:nowrap}
+/* Ráfaga */
+#vCam{position:fixed;inset:0;z-index:30;padding:0;background:#000;display:flex;flex-direction:column}
+#camStage{flex:1;position:relative;min-height:0}
+#camVideo,#camOverlay{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}
+#camOverlay{pointer-events:none}
+#camFlash{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none}
+#camFlash.go{animation:fl .25s ease-out}
+@keyframes fl{from{opacity:.8}to{opacity:0}}
+.camtop{position:absolute;top:calc(10px + env(safe-area-inset-top));left:10px;right:10px;z-index:2}
+.camtop .seg{background:rgba(0,0,0,.55)}
+.cambar{display:flex;align-items:center;justify-content:space-between;padding:16px 20px calc(18px + env(safe-area-inset-bottom));background:#000}
+.camleft{width:90px;display:flex;align-items:center;gap:8px;color:#fff;font-weight:700;font-size:14px}
+#camThumb{width:44px;height:58px;object-fit:cover;border-radius:6px;border:2px solid #fff}
+#camShot{width:76px;height:76px;border-radius:50%;border:5px solid #fff;background:#fff;box-shadow:inset 0 0 0 4px #000}
+#camShot:active{transform:scale(.92)}
+#camDone{width:90px;background:var(--pri);color:#fff;border:0;border-radius:12px;padding:12px 0;font-weight:700}
 /* Recorte */
 #vCrop{position:fixed;top:calc(var(--bar) + env(safe-area-inset-top));left:0;right:0;bottom:0;padding:0;display:flex;flex-direction:column;background:#0e1116;z-index:10}
 #stage{flex:1;position:relative;min-height:0}
@@ -84,7 +100,6 @@ label{display:flex;align-items:center;gap:8px;flex:1;font-weight:600}
 <header class="bar">
   <button id="back" class="icon" hidden aria-label="Volver">‹</button>
   <h1 id="title">Escáner</h1>
-  <span id="cvChip" class="chip" title="Detector automático de bordes">Bordes: cargando…</span>
 </header>
 
 <main>
@@ -100,10 +115,25 @@ label{display:flex;align-items:center;gap:8px;flex:1;font-weight:600}
     <input id="docName" class="name" aria-label="Nombre del escaneo" maxlength="80">
     <div id="pages" class="grid"></div>
     <div class="actions">
-      <button id="btnCam" class="btn primary">📷 Cámara</button>
+      <button id="btnCam" class="btn primary">📷 Escanear</button>
       <button id="btnGal" class="btn">🖼 Galería</button>
       <button id="btnPdf" class="btn">📄 PDF</button>
       <button id="btnText" class="btn">🔤 Texto</button>
+    </div>
+  </section>
+
+  <!-- RÁFAGA -->
+  <section id="vCam" hidden>
+    <div id="camStage">
+      <video id="camVideo" playsinline muted autoplay></video>
+      <canvas id="camOverlay"></canvas>
+      <div id="camFlash"></div>
+      <div class="camtop"><div class="seg" id="camMode"><button data-v="text">Texto impreso (OCR)</button><button data-v="image">A mano / imagen</button></div></div>
+    </div>
+    <div class="cambar">
+      <div class="camleft"><img id="camThumb" hidden alt=""><span id="camCount">0</span></div>
+      <button id="camShot" aria-label="Hacer foto"></button>
+      <button id="camDone">Hecho ✓</button>
     </div>
   </section>
 
@@ -214,13 +244,14 @@ function show(v){
   view = v;
   document.querySelectorAll('main>section').forEach(s => s.hidden = s.id !== 'v' + v[0].toUpperCase() + v.slice(1));
   $('#back').hidden = v === 'home';
-  $('#title').textContent = { home:'Escáner', doc: doc ? doc.name : 'Escaneo', crop:'Recortar página', text:'Texto' }[v];
+  $('#title').textContent = { home:'Escáner', doc: doc ? doc.name : 'Escaneo', crop:'Recortar página', text:'Texto', cam:'Escanear' }[v];
   window.scrollTo(0, 0);
   if (v === 'crop') requestAnimationFrame(sizeCrop);
 }
 $('#back').onclick = () => {
   if (view === 'doc'){ doc = null; renderHome(); show('home'); }
   else if (view === 'crop'){ ed = null; show('doc'); }
+  else if (view === 'cam'){ finishBurst(); }
   else if (view === 'text'){ renderDoc(); show('doc'); }
 };
 
@@ -251,7 +282,7 @@ $('#docList').onclick = async e => {
 $('#btnNew').onclick = () => {
   doc = { id: uid(), name: 'Escaneo ' + fmtDate(Date.now()), created: Date.now(), updated: Date.now(), pages: [] };
   renderDoc(); show('doc');
-  $('#inCam').click();
+  startBurst();
 };
 
 /* ================= Documento ================= */
@@ -298,7 +329,7 @@ $('#pages').onclick = async e => {
   }
   renderDoc(); saveDoc();
 };
-$('#btnCam').onclick = () => $('#inCam').click();
+$('#btnCam').onclick = () => startBurst();
 $('#btnGal').onclick = () => $('#inGal').click();
 ['#inCam', '#inGal'].forEach(id => $(id).onchange = e => { const f = [...e.target.files]; e.target.value = ''; handleFiles(f); });
 
@@ -332,31 +363,7 @@ async function handleFiles(files){
   finally { unbusy(); }
 }
 
-/* ================= Detección de bordes (OpenCV) ================= */
-let cvReady = false;
-function setChip(state){
-  const c = $('#cvChip');
-  c.className = 'chip' + (state === 'ok' ? ' ok' : state === 'err' ? ' err' : '');
-  c.textContent = { load:'Bordes: cargando…', ok:'Bordes: auto', err:'Bordes: manual' }[state];
-}
-function loadCV(){
-  setChip('load');
-  const s = document.createElement('script');
-  s.src = 'https://docs.opencv.org/4.10.0/opencv.js'; s.async = true;
-  s.onload = async () => {
-    try {
-      const t0 = Date.now();
-      if (window.cv && typeof window.cv.then === 'function' && !window.cv.Mat) window.cv = await window.cv;
-      while (!(window.cv && window.cv.Mat && window.cv.imread)){
-        if (Date.now() - t0 > 60000) throw new Error('timeout');
-        await sleep(200);
-      }
-      cvReady = true; setChip('ok');
-    } catch(e){ setChip('err'); }
-  };
-  s.onerror = () => setChip('err');
-  document.head.appendChild(s);
-}
+/* ================= Detección de bordes (JS propio, ligero) ================= */
 function orderCorners(pts){
   const by = f => pts.reduce((a, b) => f(b) < f(a) ? b : a);
   const byMax = f => pts.reduce((a, b) => f(b) > f(a) ? b : a);
@@ -366,54 +373,92 @@ function orderCorners(pts){
 function defaultCorners(w, h, m = 0.04){
   return [{x:w*m, y:h*m}, {x:w*(1-m), y:h*m}, {x:w*(1-m), y:h*(1-m)}, {x:w*m, y:h*(1-m)}];
 }
+function otsu(G){
+  const hist = new Float64Array(256); for (let i = 0; i < G.length; i++) hist[G[i]]++;
+  const n = G.length; let sum = 0; for (let v = 0; v < 256; v++) sum += v * hist[v];
+  let sB = 0, wB = 0, best = 0, t = 128;
+  for (let v = 0; v < 256; v++){
+    wB += hist[v]; if (!wB) continue; const wF = n - wB; if (!wF) break;
+    sB += v * hist[v]; const mB = sB / wB, mF = (sum - sB) / wF, b = wB * wF * (mB - mF) * (mB - mF);
+    if (b > best){ best = b; t = v; }
+  }
+  return t;
+}
+function morph(M, w, h, dilate){ // 3x3 erosión / dilatación
+  const O = new Uint8Array(M.length);
+  for (let y = 0; y < h; y++) for (let x = 0; x < w; x++){
+    let v = dilate ? 0 : 1;
+    for (let dy = -1; dy <= 1 && (dilate ? !v : v); dy++){
+      const yy = y + dy; if (yy < 0 || yy >= h){ if (!dilate) v = 0; continue; }
+      for (let dx = -1; dx <= 1; dx++){
+        const xx = x + dx; const m = (xx < 0 || xx >= w) ? 0 : M[yy * w + xx];
+        if (dilate && m){ v = 1; break; } if (!dilate && !m){ v = 0; break; }
+      }
+    }
+    O[y * w + x] = v;
+  }
+  return O;
+}
+function hull(pts){ // cadena monótona
+  pts.sort((a, b) => a.x - b.x || a.y - b.y);
+  const cr = (o, a, b) => (a.x - o.x) * (b.y - o.y) - (a.y - o.y) * (b.x - o.x);
+  const lo = [], up = [];
+  for (const p of pts){ while (lo.length >= 2 && cr(lo[lo.length - 2], lo[lo.length - 1], p) <= 0) lo.pop(); lo.push(p); }
+  for (let i = pts.length - 1; i >= 0; i--){ const p = pts[i]; while (up.length >= 2 && cr(up[up.length - 2], up[up.length - 1], p) <= 0) up.pop(); up.push(p); }
+  return lo.slice(0, -1).concat(up.slice(0, -1));
+}
 function detectCorners(src){
   const iw = src.naturalWidth || src.width, ih = src.naturalHeight || src.height;
-  if (!cvReady) return defaultCorners(iw, ih);
-  const s = Math.min(1, 640 / Math.max(iw, ih));
-  const c = mk(Math.round(iw * s), Math.round(ih * s));
-  c.getContext('2d').drawImage(src, 0, 0, c.width, c.height);
-  const trash = [];
-  const keep = m => (trash.push(m), m);
-  let found = null;
   try {
-    const mat = keep(cv.imread(c)), gray = keep(new cv.Mat()), blur = keep(new cv.Mat()), edges = keep(new cv.Mat());
-    cv.cvtColor(mat, gray, cv.COLOR_RGBA2GRAY);
-    cv.GaussianBlur(gray, blur, new cv.Size(5, 5), 0);
-    cv.Canny(blur, edges, 40, 140);
-    const k = keep(cv.getStructuringElement(cv.MORPH_RECT, new cv.Size(5, 5)));
-    cv.dilate(edges, edges, k);
-    const contours = keep(new cv.MatVector()), hier = keep(new cv.Mat());
-    cv.findContours(edges, contours, hier, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE);
-    const minArea = 0.15 * c.width * c.height;
-    let bestArea = 0, bestIdx = -1;
-    for (let i = 0; i < contours.size(); i++){
-      const cnt = contours.get(i); const area = cv.contourArea(cnt);
-      if (area > bestArea){ bestArea = area; bestIdx = i; }
-      if (area >= minArea){
-        const approx = new cv.Mat();
-        cv.approxPolyDP(cnt, approx, 0.02 * cv.arcLength(cnt, true), true);
-        if (approx.rows === 4 && cv.isContourConvex(approx) && (!found || area > found.area)){
-          const d = approx.data32S; found = { area, pts: [0, 1, 2, 3].map(j => ({ x: d[j*2], y: d[j*2+1] })) };
-        }
-        approx.delete();
-      }
-      cnt.delete();
+    const s = Math.min(1, 300 / Math.max(iw, ih)), w = Math.max(2, Math.round(iw * s)), h = Math.max(2, Math.round(ih * s));
+    const c = mk(w, h), x = c.getContext('2d'); x.drawImage(src, 0, 0, w, h);
+    const D = x.getImageData(0, 0, w, h).data, n = w * h, G = new Uint8Array(n);
+    // brillo penalizando color (el papel es claro y poco saturado)
+    for (let i = 0, p = 0; p < n; i += 4, p++){
+      const r = D[i], g = D[i + 1], b = D[i + 2], mx = Math.max(r, g, b), mn = Math.min(r, g, b);
+      G[p] = Math.max(0, 0.299 * r + 0.587 * g + 0.114 * b - 0.5 * (mx - mn));
     }
-    if (!found && bestIdx >= 0 && bestArea >= minArea){
-      const cnt = keep(contours.get(bestIdx)), hull = keep(new cv.Mat());
-      cv.convexHull(cnt, hull, false, true);
-      const peri = cv.arcLength(hull, true);
-      for (let eps = 0.02; eps <= 0.12 && !found; eps += 0.01){
-        const approx = new cv.Mat();
-        cv.approxPolyDP(hull, approx, eps * peri, true);
-        if (approx.rows === 4){ const d = approx.data32S; found = { pts: [0, 1, 2, 3].map(j => ({ x: d[j*2], y: d[j*2+1] })) }; }
-        approx.delete();
+    const t = otsu(G);
+    let M = new Uint8Array(n); for (let p = 0; p < n; p++) M[p] = G[p] > t ? 1 : 0;
+    M = morph(morph(M, w, h, false), w, h, true);           // apertura: quita ruido
+    M = morph(morph(M, w, h, true), w, h, false);           // cierre: tapa el texto
+    // componente clara más grande
+    const lab = new Int32Array(n).fill(-1), q = new Int32Array(n);
+    let bestId = -1, bestSize = 0;
+    for (let p0 = 0; p0 < n; p0++){
+      if (!M[p0] || lab[p0] >= 0) continue;
+      let qh = 0, qt = 0; q[qt++] = p0; lab[p0] = p0;
+      while (qh < qt){
+        const p = q[qh++], px = p % w, py = (p - px) / w;
+        if (px > 0 && M[p - 1] && lab[p - 1] < 0){ lab[p - 1] = p0; q[qt++] = p - 1; }
+        if (px < w - 1 && M[p + 1] && lab[p + 1] < 0){ lab[p + 1] = p0; q[qt++] = p + 1; }
+        if (py > 0 && M[p - w] && lab[p - w] < 0){ lab[p - w] = p0; q[qt++] = p - w; }
+        if (py < h - 1 && M[p + w] && lab[p + w] < 0){ lab[p + w] = p0; q[qt++] = p + w; }
       }
+      if (qt > bestSize){ bestSize = qt; bestId = p0; }
     }
-  } catch(e){ console.warn('detección', e); }
-  finally { trash.forEach(m => { try { m.delete(); } catch(e){} }); }
-  if (!found) return defaultCorners(iw, ih);
-  return orderCorners(found.pts.map(p => ({ x: Math.min(iw, Math.max(0, p.x / s)), y: Math.min(ih, Math.max(0, p.y / s)) })));
+    if (bestId < 0 || bestSize < 0.12 * n) return defaultCorners(iw, ih);
+    if (bestSize > 0.93 * n) return defaultCorners(iw, ih, 0);
+    // contorno: extremos izquierdo y derecho de cada fila
+    const pts = [];
+    for (let y = 0; y < h; y++){
+      let l = -1, r = -1;
+      for (let xx = 0; xx < w; xx++) if (lab[y * w + xx] === bestId){ if (l < 0) l = xx; r = xx; }
+      if (l >= 0){ pts.push({ x: l, y }, { x: r + 1, y }, { x: l, y: y + 1 }, { x: r + 1, y: y + 1 }); }
+    }
+    let H = hull(pts);
+    const area = (a, b, c2) => Math.abs((b.x - a.x) * (c2.y - a.y) - (b.y - a.y) * (c2.x - a.x));
+    while (H.length > 4){ // quita el vértice que menos área aporta
+      let mi = 0, mv = Infinity;
+      for (let i = 0; i < H.length; i++){
+        const v = area(H[(i - 1 + H.length) % H.length], H[i], H[(i + 1) % H.length]);
+        if (v < mv){ mv = v; mi = i; }
+      }
+      H.splice(mi, 1);
+    }
+    if (H.length < 4) return defaultCorners(iw, ih);
+    return orderCorners(H.map(p => ({ x: Math.min(iw, Math.max(0, p.x / s)), y: Math.min(ih, Math.max(0, p.y / s)) })));
+  } catch(e){ console.warn('detección', e); return defaultCorners(iw, ih); }
 }
 
 /* ================= Enderezado (perspectiva) y filtros ================= */
@@ -607,7 +652,6 @@ function drawLoupe(ix, iy, px){
 })();
 $('#edAuto').onclick = () => {
   if (!ed) return;
-  if (!cvReady){ toast('El detector de bordes aún no está listo. Ajusta las esquinas a mano.'); return; }
   ed.p.corners = detectCorners(ed.img); drawCrop();
 };
 $('#edAll').onclick = () => { if (!ed) return; ed.p.corners = defaultCorners(ed.img.naturalWidth, ed.img.naturalHeight, 0); drawCrop(); };
@@ -634,6 +678,97 @@ $('#edOk').onclick = async () => {
   } catch(e){ console.error(e); toast('No se pudo procesar: ' + e.message); }
   finally { unbusy(); }
 };
+
+/* ================= Escaneo en ráfaga (cámara propia) ================= */
+const cam = { stream: null, timer: null, queue: Promise.resolve(), pending: 0, count: 0, busy: false };
+function camUI(){
+  $('#camCount').textContent = cam.count + (cam.pending ? ` · procesando ${cam.pending}` : '');
+  setSeg('#camMode', settings.mode);
+}
+async function startBurst(){
+  if (!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia)){ $('#inCam').click(); return; }
+  try {
+    cam.stream = await navigator.mediaDevices.getUserMedia({ audio: false,
+      video: { facingMode: { ideal: 'environment' }, width: { ideal: 3840 }, height: { ideal: 2160 } } });
+  } catch(e){
+    toast('No se pudo abrir la cámara en la app. Uso la cámara del móvil.');
+    $('#inCam').click(); return;
+  }
+  const v = $('#camVideo'); v.srcObject = cam.stream;
+  try { await v.play(); } catch(e){}
+  cam.count = 0; cam.pending = 0; $('#camThumb').hidden = true; camUI();
+  show('cam');
+  sizeCamOverlay();
+  cam.timer = setInterval(liveDetect, 450);
+}
+function sizeCamOverlay(){
+  const o = $('#camOverlay'), st = $('#camStage'), dpr = window.devicePixelRatio || 1;
+  o.width = st.clientWidth * dpr; o.height = st.clientHeight * dpr;
+}
+window.addEventListener('resize', () => { if (view === 'cam') sizeCamOverlay(); });
+function liveDetect(){
+  const v = $('#camVideo'), o = $('#camOverlay'), x = o.getContext('2d'), dpr = window.devicePixelRatio || 1;
+  const vw = v.videoWidth, vh = v.videoHeight; if (!vw || !vh) return;
+  const s = Math.min(1, 300 / Math.max(vw, vh)), c = mk(Math.round(vw * s), Math.round(vh * s));
+  c.getContext('2d').drawImage(v, 0, 0, c.width, c.height);
+  const cr = detectCorners(c), full = cr[0].x === 0 && cr[0].y === 0;
+  const W = o.width / dpr, H = o.height / dpr, k = Math.min(W / c.width, H / c.height);
+  const ox = (W - c.width * k) / 2, oy = (H - c.height * k) / 2;
+  x.setTransform(dpr, 0, 0, dpr, 0, 0); x.clearRect(0, 0, W, H);
+  const def = Math.abs(cr[0].x - c.width * 0.04) < 0.5 && Math.abs(cr[0].y - c.height * 0.04) < 0.5;
+  if (def || full) return; // no se ha encontrado hoja
+  x.beginPath(); cr.forEach((q, i) => x[i ? 'lineTo' : 'moveTo'](ox + q.x * k, oy + q.y * k)); x.closePath();
+  x.fillStyle = 'rgba(63,169,255,.18)'; x.fill(); x.lineWidth = 3; x.strokeStyle = '#3fa9ff'; x.stroke();
+}
+async function grabPhoto(){
+  const track = cam.stream.getVideoTracks()[0];
+  if ('ImageCapture' in window){
+    try {
+      const ic = new ImageCapture(track);
+      return await Promise.race([ic.takePhoto(), sleep(4000).then(() => { throw new Error('timeout'); })]);
+    } catch(e){ /* sigue con el fotograma de vídeo */ }
+  }
+  const v = $('#camVideo'), c = mk(v.videoWidth, v.videoHeight);
+  c.getContext('2d').drawImage(v, 0, 0);
+  return await new Promise(r => c.toBlob(r, 'image/jpeg', 0.92));
+}
+$('#camShot').onclick = async () => {
+  if (!cam.stream || cam.busy) return;
+  cam.busy = true;
+  const f = $('#camFlash'); f.classList.remove('go'); void f.offsetWidth; f.classList.add('go');
+  try { navigator.vibrate && navigator.vibrate(30); } catch(e){}
+  try {
+    const blob = await grabPhoto();
+    cam.count++; cam.pending++; camUI();
+    const mode = settings.mode;
+    cam.queue = cam.queue.then(async () => {
+      try {
+        const p = await newPageFromFile(blob); p.mode = mode;
+        await processPage(p); doc.pages.push(p); await saveDoc();
+        const t = $('#camThumb'); t.src = p.thumb; t.hidden = false;
+      } catch(e){ console.error(e); cam.count--; toast('Una foto no se pudo procesar'); }
+      cam.pending--; camUI();
+    });
+  } catch(e){ toast('No se pudo hacer la foto'); }
+  finally { cam.busy = false; }
+};
+$('#camMode').onclick = e => {
+  const b = e.target.closest('button'); if (!b) return;
+  settings.mode = b.dataset.v; store.set('mode', settings.mode); camUI();
+};
+function stopCam(){
+  clearInterval(cam.timer); cam.timer = null;
+  if (cam.stream){ cam.stream.getTracks().forEach(t => t.stop()); cam.stream = null; }
+  $('#camVideo').srcObject = null;
+}
+async function finishBurst(){
+  stopCam();
+  if (cam.pending){ busy('Terminando de procesar…'); await cam.queue; unbusy(); }
+  renderDoc(); show('doc');
+  if (cam.count) toast(`${cam.count} página(s) añadidas. Toca una para retocar el recorte.`);
+}
+$('#camDone').onclick = finishBurst;
+document.addEventListener('visibilitychange', () => { if (document.hidden && view === 'cam') finishBurst(); });
 
 /* ================= PDF ================= */
 $('#btnPdf').onclick = async () => {
@@ -731,7 +866,6 @@ $('#btnTxt').onclick = () => {
 (async () => {
   try { await DB.open(); } catch(e){ toast('Este navegador no permite guardar el historial'); }
   renderHome();
-  loadCV();
   try { navigator.storage && navigator.storage.persist && navigator.storage.persist(); } catch(e){}
 })();
 </script>
